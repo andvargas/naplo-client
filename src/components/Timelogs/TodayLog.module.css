@@ -1,0 +1,32 @@
+.log {
+  list-style: none;
+  width: 60%;
+  min-width: 900px;
+  margin: 20px auto;
+  padding: 0;
+  text-align: left;
+}
+
+.taskItem {
+  margin: 1rem 0;
+  background: #dedcdd;
+  border: 1px solid gray;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.26);
+  color: black;
+  padding: 0.8rem 2rem;
+}
+
+.active {
+  border-left: 6px solid #06b6d4;
+}
+
+.duration {
+  font-weight: bold;
+}
+
+.header {
+  width: 60%;
+  min-width: 900px;
+  margin: 30px auto 10px;
+  text-align: left;
+}
