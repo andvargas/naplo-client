@@ -33,6 +33,12 @@ export interface WeeklyEntry {
   _id: string  // date string e.g. "2024-11-01"
   totalDuration: number
 }
+// mapping the old array-based format to the new object-based format
+export interface LegacyTask {
+  originalTask: string;
+  completed: boolean;
+  completedTask: string;
+}
 
 // Task
 export interface Subtask {
