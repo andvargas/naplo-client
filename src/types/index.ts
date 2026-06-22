@@ -41,22 +41,20 @@ export interface LegacyTask {
 }
 
 // Task
-export interface Subtask {
-  title: string
-  completed: boolean
-}
-
 export interface Task {
-  _id: string
-  username: string  // ObjectId ref to User
-  title: string
-  subtasks: Subtask[]
-  due?: string
-  description?: string
-  important: boolean
-  list?: string  // ObjectId ref to Project
-  createdAt: string
-  updatedAt: string
+  _id: string;
+  user: string; // ObjectId ref to User
+  todo: string;
+  doneTask?: string;
+  status: "open" | "completed" | "in progress";
+  due?: string;
+  taskType: "task" | "solution" | "question" | "link";
+  important: boolean;
+  project: string;
+  linkedTimelogId?: string;
+  completedAt?: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export type NewTask = Omit<Task, '_id' | 'createdAt' | 'updatedAt'>

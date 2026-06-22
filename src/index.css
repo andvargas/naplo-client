@@ -111,3 +111,11 @@ code {
   padding: 4px 8px;
   background: var(--code-bg);
 }
+
+a,
+button,
+[role="button"],
+input[type="submit"],
+input[type="button"] {
+  cursor: pointer;
+}

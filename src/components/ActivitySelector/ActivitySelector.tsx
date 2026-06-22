@@ -32,7 +32,6 @@ export default function ActivitySelector({
   const { user } = useAuth();
 
   const activityTypes = user?.activityTypes ?? [];
-  console.log("User activity types:", user);
 
   return (
     <div className="flex items-center justify-center gap-3 flex-wrap">

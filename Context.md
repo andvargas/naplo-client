@@ -31,6 +31,7 @@ I am rebuilding an older React/Redux time-tracking application called "Naplo" in
 │   ├── api
 │   │   ├── auth.ts
 │   │   ├── axios.ts
+│   │   ├── diaryentries.ts
 │   │   ├── projects.ts
 │   │   └── timelogs.ts
 │   ├── App.tsx
@@ -47,7 +48,10 @@ I am rebuilding an older React/Redux time-tracking application called "Naplo" in
 │   │   ├── Timelogs
 │   │   │   ├── AddTimelog.tsx
 │   │   │   ├── EditTimelog.tsx
-│   │   │   └── Timelogs.tsx
+│   │   │   ├── Timelogs.tsx
+│   │   │   ├── TodayLog.module.css
+│   │   │   ├── TodayLog.tsx
+│   │   │   └── TodaySummary.tsx
 │   │   └── Tooltip
 │   │       └── Tooltip.tsx
 │   ├── context
@@ -177,9 +181,32 @@ ts POST /projects/add
 
 ---
 
-## Backend Route
+## Existing Backend
 
-js router.route("/add").post((req, res) => {   const projectName = req.body.projectName;   const username = req.body.username;   const description = req.body.description;   const customer = req.body.customer;   const statusActive = req.body.statusActive;    const newProject = new Project({     username,     projectName,     description,     customer,     statusActive,   });    newProject     .save()     .then(() => res.json("Project added"))     .catch((error) => res.status(400).json("Error " + error)); }); 
+Timelog Model
+
+Fields currently used:
+
+- username
+- tasksAccomplished
+- duration
+- startDate
+- project
+- customer
+- activityType
+- totalDailyMinutes
+
+Important:
+
+- duration stores session duration in milliseconds.
+- startDate stores exact session start timestamp.
+- totalDailyMinutes is currently being repurposed to store lunch-break duration in milliseconds.
+
+We intentionally did NOT modify the backend schema yet because the old Naplo is still in production.
+
+### Backend Route
+
+```js router.route("/add").post((req, res) => {   const projectName = req.body.projectName;   const username = req.body.username;   const description = req.body.description;   const customer = req.body.customer;   const statusActive = req.body.statusActive;    const newProject = new Project({     username,     projectName,     description,     customer,     statusActive,   });    newProject     .save()     .then(() => res.json("Project added"))     .catch((error) => res.status(400).json("Error " + error)); });```
 
 ---
 
@@ -207,7 +234,13 @@ was added.
 
 ---
 
-## Current Home.tsx
+## Home.tsx current features
+
+Home owns:
+
+- activityType
+- project
+- customer
 
 Home currently:
 
@@ -215,6 +248,9 @@ Home currently:
 - filters projects for logged-in user
 - passes project names and customers to ActivitySelector
 - opens Add Project modal
+- Starts a session, Pauses the workday, adds lunch break, Finishes the day and logs a diary entry
+- Lists all sessions for today
+- computes net time spent on work, gross time deducting lunch break
 
 Projects are loaded with:
 

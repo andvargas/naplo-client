@@ -1,4 +1,3 @@
-// src/api/projects.ts
 import api from "./axios";
 
 export interface Project {

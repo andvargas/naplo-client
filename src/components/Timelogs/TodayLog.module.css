@@ -8,12 +8,15 @@
 }
 
 .taskItem {
+  display: flex;
+  align-items: center;
   margin: 1rem 0;
   background: #dedcdd;
   border: 1px solid gray;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.26);
   color: black;
   padding: 0.8rem 2rem;
+  gap: 1rem;
 }
 
 .active {
@@ -29,4 +32,141 @@
   min-width: 900px;
   margin: 30px auto 10px;
   text-align: left;
+}
+
+.actions {
+  align-items: center;    /* Add this - vertically centers icons */
+  flex-shrink: 0;         /* Add this - prevents actions from shrinking */
+  margin-top: 0; 
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 10px;
+}
+
+.taskText {
+  flex: 1;
+}
+
+.roundButton {
+  border: none;
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 45px;
+  padding: 6px 6px;
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+.taskTypeButtons {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.taskTypeButton {
+  padding: 6px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background: white;
+  cursor: pointer;
+}
+
+.task {
+  background: #e5e7eb;
+}
+
+.solution {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.question {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.link {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.task,
+.solution,
+.question,
+.link {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+}
+
+.activeType {
+  background: #2563eb;
+  color: white;
+}
+
+.addTaskBar {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.addTaskBar input {
+  flex: 1;
+}
+
+.taskList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.taskRow {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+}
+
+.taskRow:hover .taskTypeIcons {
+  opacity: 1;
+}
+
+.taskActions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.taskTypeIcons {
+  display: flex;
+  gap: 6px;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.taskEditor {
+  min-width: 430px;
+  max-width: 100%;
+  padding: 6px;
+  min-height: 40px;
+  font-size: inherit;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.taskContent {
+  flex: 1;
+  min-width: 0;
+}
+
+.left {
+  width: 30px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
 }
