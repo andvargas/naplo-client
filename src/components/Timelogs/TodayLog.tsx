@@ -105,23 +105,6 @@ export default function TodayLog({ logs }: Props) {
     );
   };
 
-  // colour coding for task types
-  const getTaskTypeClass = (type: string) => {
-    switch (type) {
-      case "solution":
-        return styles.solution;
-
-      case "question":
-        return styles.question;
-
-      case "link":
-        return styles.link;
-
-      default:
-        return styles.task;
-    }
-  };
-
   return (
     <>
       <h3 className={styles.header}>Today's Activity</h3>
@@ -246,48 +229,9 @@ export default function TodayLog({ logs }: Props) {
                 />
 
                 {editingTaskId === task._id ? (
-                  <textarea
-                    autoFocus
-                    className={styles.taskEditor}
-                    value={editValue}
-                    onChange={(e) => setEditValue(e.target.value)}
-                    onBlur={async () => {
-                      const trimmed = editValue.trim();
-
-                      if (trimmed) {
-                        await editTask(task._id, {
-                          ...(task.status === "completed" ? { doneTask: trimmed } : { todo: trimmed }),
-                        });
-                      }
-
-                      setEditingTaskId(null);
-                    }}
-                    onKeyDown={async (e) => {
-                      if (e.key === "Enter") {
-                        const trimmed = editValue.trim();
-
-                        if (trimmed) {
-                          await editTask(task._id, {
-                            ...(task.status === "completed" ? { doneTask: trimmed } : { todo: trimmed }),
-                          });
-                        }
-
-                        setEditingTaskId(null);
-                      }
-
-                      if (e.key === "Escape") {
-                        setEditingTaskId(null);
-                      }
-                    }}
-                  />
+                  <textarea autoFocus className={styles.taskEditor} value={editValue} onChange={(e) => setEditValue(e.target.value)} />
                 ) : (
-                  <div className={styles.taskContent}>
-                    {editingTaskId === task._id ? (
-                      <textarea autoFocus className={styles.taskEditor} value={editValue} onChange={(e) => setEditValue(e.target.value)} />
-                    ) : (
-                      <>{task.status === "completed" ? task.doneTask || task.todo : task.todo}</>
-                    )}
-                  </div>
+                  <div className={styles.taskContent}>{task.status === "completed" ? task.doneTask || task.todo : task.todo}</div>
                 )}
               </div>
               <div className={styles.taskActions}>

@@ -74,35 +74,6 @@
   cursor: pointer;
 }
 
-.task {
-  background: #e5e7eb;
-}
-
-.solution {
-  background: #dcfce7;
-  color: #166534;
-}
-
-.question {
-  background: #fef3c7;
-  color: #92400e;
-}
-
-.link {
-  background: #dbeafe;
-  color: #1d4ed8;
-}
-
-.task,
-.solution,
-.question,
-.link {
-  display: inline-block;
-  padding: 2px 8px;
-  border-radius: 12px;
-  font-size: 12px;
-}
-
 .activeType {
   background: #2563eb;
   color: white;
