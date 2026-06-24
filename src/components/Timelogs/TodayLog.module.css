@@ -35,8 +35,8 @@
 }
 
 .actions {
-  align-items: center;    /* Add this - vertically centers icons */
-  flex-shrink: 0;         /* Add this - prevents actions from shrinking */
+  align-items: center;
+  flex-shrink: 0;
   margin-top: 0; 
   display: flex;
   gap: 10px;
@@ -140,4 +140,24 @@
   flex-shrink: 0;
   display: flex;
   align-items: center;
+}
+
+.editTypeIcons {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.editTypeIcons button {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+}
+
+.activeTypeIcon {
+  background: #e0f2fe;
+  border-radius: 4px;
 }

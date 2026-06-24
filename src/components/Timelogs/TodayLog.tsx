@@ -195,6 +195,7 @@ export default function TodayLog({ logs }: Props) {
           </select>
 
           <button
+            className="bg-blue-500 text-white px-4 py-2 rounded"
             onClick={async () => {
               if (!selectedLog || !newTaskText.trim()) return;
 
@@ -237,6 +238,39 @@ export default function TodayLog({ logs }: Props) {
               <div className={styles.taskActions}>
                 {editingTaskId === task._id ? (
                   <>
+                    <div className={styles.editTypeIcons}>
+                      <button
+                        type="button"
+                        className={task.taskType === "task" ? styles.activeTypeIcon : ""}
+                        onClick={() => editTask(task._id, { taskType: "task" })}
+                      >
+                        <LuClipboardList />
+                      </button>
+
+                      <button
+                        type="button"
+                        className={task.taskType === "solution" ? styles.activeTypeIcon : ""}
+                        onClick={() => editTask(task._id, { taskType: "solution" })}
+                      >
+                        <LuLightbulb />
+                      </button>
+
+                      <button
+                        type="button"
+                        className={task.taskType === "question" ? styles.activeTypeIcon : ""}
+                        onClick={() => editTask(task._id, { taskType: "question" })}
+                      >
+                        <LuCircleHelp />
+                      </button>
+
+                      <button
+                        type="button"
+                        className={task.taskType === "link" ? styles.activeTypeIcon : ""}
+                        onClick={() => editTask(task._id, { taskType: "link" })}
+                      >
+                        <LuLink />
+                      </button>
+                    </div>
                     <button
                       onClick={async () => {
                         const trimmed = editValue.trim();
