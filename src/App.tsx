@@ -11,7 +11,7 @@ import Home from './pages/Home'
 import Dashboard from './pages/Dashboard'
 import Timelogs from './components/Timelogs/Timelogs'
 import EditTimelog from './components/Timelogs/EditTimelog'
-import DiaryEntryList from './pages/DiaryEntryList'
+import Journal from "./pages/Journal";
 import Projects from './pages/Projects'
 import Timesheet from './pages/Timesheet'
 
@@ -44,61 +44,82 @@ function App() {
         <Route path="/register" element={<Register />} />
 
         {/* Protected routes */}
-        <Route path="/" element={
-          <ProtectedRoute>
-            <Layout>
-              <Home />
-            </Layout>
-          </ProtectedRoute>
-        } />
-        <Route path="/timelogs" element={
-          <ProtectedRoute>
-            <Layout>
-              <Timelogs />
-            </Layout>
-          </ProtectedRoute>
-        } />
-        <Route path="/dashboard" element={
-          <ProtectedRoute>
-            <Layout>
-              <Dashboard />
-            </Layout>
-          </ProtectedRoute>
-        } />
-        <Route path="/timelogs/edit/:id" element={
-          <ProtectedRoute>
-            <Layout>
-              <EditTimelog />
-            </Layout>
-          </ProtectedRoute>
-        } />
-        <Route path="/diary" element={
-          <ProtectedRoute>
-            <Layout>
-              <DiaryEntryList />
-            </Layout>
-          </ProtectedRoute>
-        } />
-        <Route path="/projects" element={
-          <ProtectedRoute>
-            <Layout>
-              <Projects />
-            </Layout>
-          </ProtectedRoute>
-        } />
-        <Route path="/timesheet" element={
-          <ProtectedRoute>
-            <Layout>
-              <Timesheet />
-            </Layout>
-          </ProtectedRoute>
-        } />
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <Home />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/timelogs"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <Timelogs />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <Dashboard />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/timelogs/edit/:id"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <EditTimelog />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/journal"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <Journal />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/projects"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <Projects />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/timesheet"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <Timesheet />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
 
         {/* Fallback */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
-  )
+  );
 }
 
 export default App

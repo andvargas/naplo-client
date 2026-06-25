@@ -10,41 +10,26 @@ export interface CreateTaskData {
   important?: boolean;
 }
 
-export const getTasksByTimelog = async (
-  timelogId: string
-): Promise<Task[]> => {
-  const response = await api.get(
-    `/tasks/timelog/${timelogId}`
-  );
+export const getTasksByTimelog = async (timelogId: string): Promise<Task[]> => {
+  const response = await api.get(`/tasks/timelog/${timelogId}`);
 
   return response.data;
 };
 
-export const createTask = async (
-  data: CreateTaskData
-): Promise<Task> => {
-  const response = await api.post(
-    "/tasks/add",
-    data
-  );
+export const createTask = async (data: CreateTaskData): Promise<Task> => {
+  const response = await api.post("/tasks/add", data);
 
   return response.data;
 };
 
-export const updateTask = async (
-  id: string,
-  data: Partial<Task>
-): Promise<Task> => {
-  const response = await api.put(
-    `/tasks/${id}`,
-    data
-  );
+export const updateTask = async (id: string, data: Partial<Task>): Promise<Task> => {
+  const response = await api.put(`/tasks/${id}`, data);
 
   return response.data;
 };
 
-export const deleteTask = async (
-  id: string
-): Promise<void> => {
+export const deleteTask = async (id: string): Promise<void> => {
   await api.delete(`/tasks/${id}`);
 };
+
+export const getAllTasks = () => api.get<Task[]>("/tasks");

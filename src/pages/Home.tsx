@@ -10,9 +10,10 @@ import type { Timelog } from "@/types";
 import TodaySummary from "@/components/Timelogs/TodaySummary";
 import TodayLog from "@/components/Timelogs/TodayLog";
 import { addDiaryEntry } from "@/api/diaryentries";
+import { updateUserActivityTypes } from "@/api/user";
 
 export default function Home() {
-  const { user } = useAuth();
+  const { user, updateActivityTypes } = useAuth();
   const [activityType, setActivityType] = useState("");
   const [project, setProject] = useState("");
   const [customer, setCustomer] = useState("");
@@ -138,6 +139,27 @@ export default function Home() {
       setProjects(filtered);
     } catch (err: any) {
       alert(err.response?.data || "Failed to create project");
+    }
+  };
+
+  const handleAddActivityType = async (newType: string) => {
+    if (!user) return;
+
+    try {
+      const currentTypes = user.activityTypes ?? [];
+      const updatedTypes = [...currentTypes, newType];
+
+      // Send both username and the new array to the backend route
+      await updateUserActivityTypes(user.username, updatedTypes);
+
+      // Update local global auth context state so changes reflect instantly in dropdown
+      updateActivityTypes(updatedTypes);
+
+      // Automatically select the newly created type for convenience
+      setActivityType(newType);
+    } catch (err: any) {
+      console.error("Failed to add activity type:", err);
+      alert(err.response?.data || "Failed to save the new activity type to the database.");
     }
   };
 
@@ -301,6 +323,7 @@ Sessions completed: ${todaysLogs.length}
         onProjectChange={setProject}
         onCustomerChange={setCustomer}
         onAddProject={() => setShowAddProjectModal(true)}
+        onAddActivityType={handleAddActivityType}
       />
       <Modal isOpen={showAddProjectModal} title="Add Project" onClose={() => setShowAddProjectModal(false)}>
         <AddProjectForm onSubmit={handleAddProject} />

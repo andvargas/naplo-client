@@ -29,7 +29,7 @@ const Navbar = () => {
           </NavLink>
         </li>
         <li>
-          <NavLink to="/diary" className={navLinkClass}>
+          <NavLink to="/journal" className={navLinkClass}>
             JOURNAL
           </NavLink>
         </li>
@@ -48,18 +48,15 @@ const Navbar = () => {
           </Tooltip>
         </li>
         <li className="ml-2 border-l border-gray-700 pl-2">
-          <Tooltip label={`Logout ${state.user?.username ?? ''}`}>
-            <button
-              onClick={handleLogout}
-              className="px-3 py-2 rounded text-amber-100 hover:bg-red-600 hover:text-white transition-colors"
-            >
+          <Tooltip label={`Logout ${state.user?.username ?? ""}`}>
+            <button onClick={handleLogout} className="px-3 py-2 rounded text-amber-100 hover:bg-red-600 hover:text-white transition-colors">
               <FiLogOut />
             </button>
           </Tooltip>
         </li>
       </ul>
     </nav>
-  )
+  );
 }
 
 export default Navbar

@@ -17,9 +17,10 @@ export interface NewDiaryEntry {
   entryType: string;
 }
 
-export const getDiaryEntries = () =>
-  api.get<DiaryEntry[]>("/entries");
+export const getDiaryEntries = () => api.get<DiaryEntry[]>("/entries");
 
-export const addDiaryEntry = (
-  data: NewDiaryEntry
-) => api.post("/entries/add", data);
+export const addDiaryEntry = (data: NewDiaryEntry) => api.post("/entries/add", data);
+
+export const updateDiaryEntry = (id: string, data: Partial<NewDiaryEntry>) => api.patch<DiaryEntry>(`/entries/${id}`, data);
+
+export const deleteDiaryEntry = (id: string) => api.delete(`/entries/${id}`);

@@ -15,6 +15,7 @@ interface Props {
   onCustomerChange: (value: string) => void;
 
   onAddProject: () => void;
+  onAddActivityType: (newType: string) => void;
 }
 
 export default function ActivitySelector({
@@ -27,16 +28,37 @@ export default function ActivitySelector({
   onProjectChange,
   onCustomerChange,
   onAddProject,
+  onAddActivityType,
 }: Props) {
-
   const { user } = useAuth();
 
   const activityTypes = user?.activityTypes ?? [];
+  const handleActivityTypeChange = (value: string) => {
+    if (value === "ADD_NEW_TYPE") {
+      const newType = prompt("Enter new activity type:");
+
+      // Basic validation to ensure they didn't hit cancel or type empty spaces
+      if (newType && newType.trim() !== "") {
+        const cleanType = newType.trim();
+
+        if (activityTypes.includes(cleanType)) {
+          alert("This activity type already exists!");
+          return;
+        }
+
+        onAddActivityType(cleanType);
+      }
+      // Reset the selector value back to empty so it doesn't stay stuck on "Add new type..."
+      onActivityTypeChange("");
+    } else {
+      onActivityTypeChange(value);
+    }
+  };
 
   return (
     <div className="flex items-center justify-center gap-3 flex-wrap">
       Add new activity:
-      <select className="px-3 py-2 bg-gray-200 rounded border" value={activityType} onChange={(e) => onActivityTypeChange(e.target.value)}>
+      <select className="px-3 py-2 bg-gray-200 rounded border" value={activityType} onChange={(e) => handleActivityTypeChange(e.target.value)}>
         <option value="">Type</option>
 
         {activityTypes.map((type) => (
@@ -44,6 +66,9 @@ export default function ActivitySelector({
             {type}
           </option>
         ))}
+        <option value="ADD_NEW_TYPE" className="text-green-600 font-semibold">
+          + Add new type...
+        </option>
       </select>
       <select className="px-3 py-2 bg-gray-200 rounded border" value={project} onChange={(e) => onProjectChange(e.target.value)}>
         <option value="">Project</option>
