@@ -19,6 +19,16 @@
   gap: 1rem;
 }
 
+.taskInput {
+  flex: 1;
+  min-width: 0;
+  padding: 6px;
+  font-size: inherit;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
 .active {
   border-left: 6px solid #06b6d4;
 }
