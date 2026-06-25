@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { getProjects, addProject, type Project } from "@/api/projects";
 import { useAuth } from "@/context/AuthContext";
 
-export default function useProjects() {
+export default function useProjects(activeOnly = true) {
   const { user } = useAuth();
 
   const [projects, setProjects] = useState<Project[]>([]);
@@ -13,14 +13,9 @@ export default function useProjects() {
 
     try {
       const data = await getProjects();
+      const filtered = data.filter((p) => p.username === user.username);
 
-      setProjects(
-        data.filter(
-          (p) =>
-            p.statusActive &&
-            p.username === user.username
-        )
-      );
+      setProjects(activeOnly ? filtered.filter((p) => p.statusActive) : filtered);
     } finally {
       setLoading(false);
     }
@@ -30,13 +25,7 @@ export default function useProjects() {
     loadProjects();
   }, [user]);
 
-  const createProject = async (
-    projectData: {
-      projectName: string;
-      customer: string;
-      description: string;
-    }
-  ) => {
+  const createProject = async (projectData: { projectName: string; customer: string; description: string }) => {
     await addProject(projectData);
 
     await loadProjects();

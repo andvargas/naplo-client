@@ -261,3 +261,15 @@ Derived values:
 ts const projectNames = projects.map((p) => p.projectName);  const customers = [   ...new Set(projects.map((p) => p.customer)), ]; 
 
 ---
+
+## Task system design decision
+
+- Each task has:
+  - todo (original text)
+  - doneTask?: string (snapshot of completed text)
+  - status: "open" | "completed"
+  - taskType: "task" | "solution" | "question" | "link"
+- UI behavior:
+  - If completed → display doneTask || todo
+  - If open → display todo
+  - Checkbox toggles completion
