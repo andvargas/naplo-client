@@ -1,5 +1,3 @@
-import type { Project } from "@/api/projects";
-
 interface Props {
   selectedMonth: string;
   selectedYear: number;
@@ -15,10 +13,7 @@ interface Props {
   onChangeWeekFilter: (filter: "none" | "this" | "last") => void;
 }
 
-const MONTHS = [
-  "January", "February", "March", "April", "May", "June",
-  "July", "August", "September", "October", "November", "December",
-];
+const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
 export default function DashboardFilterBar({
   selectedMonth,
@@ -41,9 +36,7 @@ export default function DashboardFilterBar({
           <button
             key={w}
             onClick={() => onChangeWeekFilter(w)}
-            className={`px-3 py-1.5 text-sm rounded border ${
-              weekFilter === w ? "bg-gray-800 text-white" : "hover:bg-gray-100"
-            }`}
+            className={`px-3 py-1.5 text-sm rounded border ${weekFilter === w ? "bg-gray-800 text-white" : "hover:bg-gray-100"}`}
           >
             {w === "none" ? "Month/Year" : w === "this" ? "This Week" : "Last Week"}
           </button>
@@ -58,7 +51,9 @@ export default function DashboardFilterBar({
           disabled={weekFilter !== "none"}
         >
           {MONTHS.map((m, i) => (
-            <option key={m} value={i.toString()}>{m}</option>
+            <option key={m} value={i.toString()}>
+              {m}
+            </option>
           ))}
         </select>
 
@@ -69,29 +64,27 @@ export default function DashboardFilterBar({
           disabled={weekFilter !== "none"}
         >
           {Array.from({ length: 5 }, (_, i) => new Date().getFullYear() - i).map((y) => (
-            <option key={y} value={y}>{y}</option>
+            <option key={y} value={y}>
+              {y}
+            </option>
           ))}
         </select>
 
-        <select
-          className="border rounded p-2 text-sm"
-          value={selectedCustomer}
-          onChange={(e) => onChangeCustomer(e.target.value)}
-        >
+        <select className="border rounded p-2 text-sm" value={selectedCustomer} onChange={(e) => onChangeCustomer(e.target.value)}>
           <option value="all">All Customers</option>
           {customers.map((c) => (
-            <option key={c} value={c}>{c}</option>
+            <option key={c} value={c}>
+              {c}
+            </option>
           ))}
         </select>
 
-        <select
-          className="border rounded p-2 text-sm"
-          value={selectedActivityType}
-          onChange={(e) => onChangeActivityType(e.target.value)}
-        >
+        <select className="border rounded p-2 text-sm" value={selectedActivityType} onChange={(e) => onChangeActivityType(e.target.value)}>
           <option value="all">All Activity Types</option>
           {activityTypes.map((t) => (
-            <option key={t} value={t}>{t}</option>
+            <option key={t} value={t}>
+              {t}
+            </option>
           ))}
         </select>
       </div>
