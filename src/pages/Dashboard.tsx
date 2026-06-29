@@ -8,6 +8,7 @@ import DashboardFilterBar from "@/components/Dashboard/DashboardFilterBar";
 import SessionsList from "@/components/Dashboard/SessionsList";
 import { getAllTasks } from "@/api/tasks";
 import type { Timelog, Task } from "@/types";
+import { updateTimelog } from "@/api/timelogs";
 
 const isThisWeek = (date: Date) => {
   const now = new Date();
@@ -61,6 +62,11 @@ export default function Dashboard() {
       })
       .finally(() => setLoading(false));
   }, [user]);
+
+  const handleDurationUpdate = async (id: string, durationMs: number) => {
+    await updateTimelog(id, { duration: durationMs });
+    setAllLogs((prev) => prev.map((log) => (log._id === id ? { ...log, duration: durationMs } : log)));
+  };
 
   const customers = useMemo(() => Array.from(new Set(projects.map((p) => p.customer).filter(Boolean))) as string[], [projects]);
 
@@ -137,7 +143,7 @@ export default function Dashboard() {
         {Math.round((totalDuration % 3600000) / 60000)}m
       </div>
 
-      <SessionsList sessions={filteredLogs} taskCountByLog={taskCountByLog} />
+      <SessionsList sessions={filteredLogs} taskCountByLog={taskCountByLog} onDurationUpdate={handleDurationUpdate} />
     </div>
   );
 }

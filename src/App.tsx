@@ -14,6 +14,7 @@ import EditTimelog from './components/Timelogs/EditTimelog'
 import Journal from "./pages/Journal";
 import Projects from './pages/Projects'
 import Timesheet from './pages/Timesheet'
+import Week from './pages/Week'
 
 // Protected route wrapper
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -110,6 +111,16 @@ function App() {
             <ProtectedRoute>
               <Layout>
                 <Timesheet />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/weekly-stats"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <Week />
               </Layout>
             </ProtectedRoute>
           }

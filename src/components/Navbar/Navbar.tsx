@@ -35,7 +35,7 @@ const Navbar = () => {
         </li>
         <li>
           <Tooltip label="Weekly Hours">
-            <NavLink to="/weekly" className={navLinkClass}>
+            <NavLink to="/weekly-stats" className={navLinkClass}>
               WEEK
             </NavLink>
           </Tooltip>
