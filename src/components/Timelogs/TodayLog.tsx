@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useTasks } from "@/hooks/useTasks";
 import type { Timelog } from "@/types";
-import styles from "./TodayLog.module.css";
 import Modal from "@/components/Modal/Modal";
 import Tooltip from "@/components/Tooltip/Tooltip";
 import {
@@ -22,11 +21,16 @@ interface Props {
   logs: Timelog[];
 }
 
+const taskTypeIcon = {
+  task: LuClipboardList,
+  solution: LuLightbulb,
+  question: LuCircleHelp,
+  link: LuLink,
+};
+
 export default function TodayLog({ logs }: Props) {
   const [selectedLog, setSelectedLog] = useState<Timelog | null>(null);
-
   const [quickTaskOpen, setQuickTaskOpen] = useState(false);
-
   const [taskManagerOpen, setTaskManagerOpen] = useState(false);
 
   const sortedLogs = [...logs].sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime());
@@ -36,12 +40,7 @@ export default function TodayLog({ logs }: Props) {
   const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
   const [editValue, setEditValue] = useState("");
 
-  const formatTime = (date: string) => {
-    return new Date(date).toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
+  const formatTime = (date: string) => new Date(date).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 
   const { tasks, addTask, editTask, removeTask, reload } = useTasks(selectedLog?._id);
 
@@ -53,37 +52,37 @@ export default function TodayLog({ logs }: Props) {
 
   return (
     <>
-      <h3 className={styles.header}>Today's Activity</h3>
+      <h3 className="max-w-3xl mx-auto px-4 text-left mt-8 mb-2 text-lg font-semibold">Today's Activity</h3>
 
-      <ul className={styles.log}>
+      <ul className="max-w-3xl mx-auto px-4 list-none space-y-4 text-left">
         {sortedLogs.map((log) => (
-          <li key={log._id} className={`${styles.taskItem} ${log.duration === 0 ? styles.active : ""}`}>
-            <span className={styles.taskText}>
-              At <strong>{formatTime(log.startDate)}</strong> started working on <strong>{log.project}</strong>
-              {" ("}
-              {log.activityType}
-              {")"}
+          <li
+            key={log._id}
+            className={`flex flex-col sm:flex-row sm:items-center gap-3 bg-gray-100 border border-gray-300 shadow-sm px-4 py-3 ${
+              log.duration === 0 ? "border-l-4 border-l-cyan-500" : ""
+            }`}
+          >
+            <span className="flex-1 text-sm sm:text-base">
+              At <strong>{formatTime(log.startDate)}</strong> started working on <strong>{log.project}</strong> ({log.activityType})
               {log.duration === 0 ? (
                 <>
                   {" "}
-                  • <span className={styles.duration}>Active</span>
+                  · <span className="font-bold">Active</span>
                 </>
               ) : (
                 <>
                   {" "}
-                  • Spent <span className={styles.duration}>{Math.round(log.duration / 60000)}</span> minutes
+                  · Spent <span className="font-bold">{Math.round(log.duration / 60000)}</span> minutes
                 </>
               )}
             </span>
 
-            {/* ACTIONS */}
-            <div className={styles.actions}>
+            <div className="flex items-center gap-2 justify-end shrink-0">
               <Tooltip label="Add quick task">
                 <button
-                  className={styles.roundButton}
+                  className="border border-gray-300 bg-white rounded-full p-2 hover:bg-gray-50"
                   onClick={() => {
                     setSelectedLog(log);
-
                     setQuickTaskOpen(true);
                   }}
                 >
@@ -93,19 +92,20 @@ export default function TodayLog({ logs }: Props) {
 
               <Tooltip label="Manage tasks">
                 <button
-                  className={styles.roundButton}
+                  className="border border-gray-300 bg-white rounded-full p-2 hover:bg-gray-50"
                   onClick={() => {
                     setSelectedLog(log);
                     setTaskManagerOpen(true);
                   }}
                 >
-                  <LuClipboardPenLine color="blue" width="30" />
+                  <LuClipboardPenLine color="blue" />
                 </button>
               </Tooltip>
             </div>
           </li>
         ))}
       </ul>
+
       <Modal isOpen={quickTaskOpen} title="Quick Task" onClose={() => setQuickTaskOpen(false)}>
         <QuickTaskInput
           onSubmit={async (text: string, taskType) => {
@@ -122,6 +122,7 @@ export default function TodayLog({ logs }: Props) {
           }}
         />
       </Modal>
+
       <Modal
         isOpen={taskManagerOpen}
         title="Session Tasks"
@@ -139,11 +140,17 @@ export default function TodayLog({ logs }: Props) {
             }
           }}
         >
-          <div className={styles.addTaskBar}>
-            <input className={styles.taskInput} value={newTaskText} onChange={(e) => setNewTaskText(e.target.value)} placeholder="New task..." />
+          {/* Add task bar */}
+          <div className="flex flex-col sm:flex-row gap-2 mb-5">
+            <input
+              className="flex-1 min-w-0 border border-gray-300 rounded p-2"
+              value={newTaskText}
+              onChange={(e) => setNewTaskText(e.target.value)}
+              placeholder="New task..."
+            />
 
             <select
-              className="border p-2 rounded"
+              className="border border-gray-300 rounded p-2"
               value={newTaskType}
               onChange={(e) => setNewTaskType(e.target.value as "task" | "solution" | "question" | "link")}
             >
@@ -154,7 +161,7 @@ export default function TodayLog({ logs }: Props) {
             </select>
 
             <button
-              className="bg-blue-500 text-white px-4 py-2 rounded"
+              className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded shrink-0"
               onClick={async () => {
                 if (!selectedLog || !newTaskText.trim()) return;
 
@@ -172,125 +179,112 @@ export default function TodayLog({ logs }: Props) {
               Add
             </button>
           </div>
-          <div className={styles.taskList}>
-            {tasks.map((task) => (
-              <div key={task._id} className={styles.taskRow}>
-                <div className={styles.taskActions}>
-                  <input
-                    type="checkbox"
-                    checked={task.status === "completed"}
-                    onChange={() =>
-                      editTask(task._id, {
-                        status: task.status === "completed" ? "open" : "completed",
 
-                        ...(task.status !== "completed" && !task.doneTask ? { doneTask: task.todo } : {}),
-                      })
-                    }
-                  />
+          {/* Task list */}
+          <div className="flex flex-col gap-3">
+            {tasks.map((task) => {
+              const TypeIcon = taskTypeIcon[task.taskType];
 
-                  {editingTaskId === task._id ? (
-                    <textarea autoFocus className={styles.taskEditor} value={editValue} onChange={(e) => setEditValue(e.target.value)} />
-                  ) : (
-                    <div className={styles.taskContent}>{task.status === "completed" ? task.doneTask || task.todo : task.todo}</div>
-                  )}
-                </div>
-                <div className={styles.taskActions}>
-                  {editingTaskId === task._id ? (
-                    <>
-                      <div className={styles.editTypeIcons}>
+              return (
+                <div
+                  key={task._id}
+                  className="group flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-gray-200 pb-3"
+                >
+                  <div className="flex items-start gap-2 min-w-0">
+                    <input
+                      type="checkbox"
+                      className="mt-1 shrink-0"
+                      checked={task.status === "completed"}
+                      onChange={() =>
+                        editTask(task._id, {
+                          status: task.status === "completed" ? "open" : "completed",
+                          ...(task.status !== "completed" && !task.doneTask ? { doneTask: task.todo } : {}),
+                        })
+                      }
+                    />
+
+                    {editingTaskId === task._id ? (
+                      <textarea
+                        autoFocus
+                        className="w-full min-h-[40px] border border-gray-300 rounded p-2"
+                        value={editValue}
+                        onChange={(e) => setEditValue(e.target.value)}
+                      />
+                    ) : (
+                      <div className="flex-1 min-w-0 text-sm">{task.status === "completed" ? task.doneTask || task.todo : task.todo}</div>
+                    )}
+                  </div>
+
+                  <div className="flex items-center gap-2 shrink-0 self-end sm:self-auto">
+                    {editingTaskId === task._id ? (
+                      <>
+                        <div className="flex gap-1">
+                          {(["task", "solution", "question", "link"] as const).map((type) => {
+                            const Icon = taskTypeIcon[type];
+                            return (
+                              <button
+                                key={type}
+                                type="button"
+                                className={`p-1 rounded ${task.taskType === type ? "bg-sky-100" : ""}`}
+                                onClick={() => editTask(task._id, { taskType: type })}
+                              >
+                                <Icon />
+                              </button>
+                            );
+                          })}
+                        </div>
+
                         <button
-                          type="button"
-                          className={task.taskType === "task" ? styles.activeTypeIcon : ""}
-                          onClick={() => editTask(task._id, { taskType: "task" })}
-                        >
-                          <LuClipboardList />
-                        </button>
+                          onClick={async () => {
+                            const trimmed = editValue.trim();
+                            if (!trimmed) return;
 
-                        <button
-                          type="button"
-                          className={task.taskType === "solution" ? styles.activeTypeIcon : ""}
-                          onClick={() => editTask(task._id, { taskType: "solution" })}
-                        >
-                          <LuLightbulb />
-                        </button>
+                            await editTask(task._id, {
+                              ...(task.status === "completed" ? { doneTask: trimmed } : { todo: trimmed }),
+                            });
 
-                        <button
-                          type="button"
-                          className={task.taskType === "question" ? styles.activeTypeIcon : ""}
-                          onClick={() => editTask(task._id, { taskType: "question" })}
-                        >
-                          <LuCircleHelp />
-                        </button>
-
-                        <button
-                          type="button"
-                          className={task.taskType === "link" ? styles.activeTypeIcon : ""}
-                          onClick={() => editTask(task._id, { taskType: "link" })}
-                        >
-                          <LuLink />
-                        </button>
-                      </div>
-                      <button
-                        onClick={async () => {
-                          const trimmed = editValue.trim();
-
-                          if (!trimmed) return;
-
-                          await editTask(task._id, {
-                            ...(task.status === "completed" ? { doneTask: trimmed } : { todo: trimmed }),
-                          });
-
-                          setEditingTaskId(null);
-                        }}
-                      >
-                        <LuCheck color="green" />
-                      </button>
-
-                      <button
-                        onClick={() => {
-                          setEditingTaskId(null);
-                        }}
-                      >
-                        <LuX color="red" />
-                      </button>
-                    </>
-                  ) : (
-                    <>
-                      <div className={styles.taskTypeIcons}>
-                        {task.taskType === "task" && <LuClipboardList />}
-
-                        {task.taskType === "solution" && <LuLightbulb />}
-
-                        {task.taskType === "question" && <LuCircleHelp />}
-
-                        {task.taskType === "link" && <LuLink />}
-                      </div>
-
-                      <Tooltip label="Edit task">
-                        <button
-                          onClick={() => {
-                            setEditingTaskId(task._id);
-
-                            setEditValue(task.status === "completed" ? task.doneTask || task.todo : task.todo);
+                            setEditingTaskId(null);
                           }}
                         >
-                          <LuNotebookPen color="blue" />
+                          <LuCheck color="green" />
                         </button>
-                      </Tooltip>
 
-                      <Tooltip label="Delete task">
-                        <button onClick={() => removeTask(task._id)}>
-                          <LuTrash2 color="red" />
+                        <button onClick={() => setEditingTaskId(null)}>
+                          <LuX color="red" />
                         </button>
-                      </Tooltip>
-                    </>
-                  )}
+                      </>
+                    ) : (
+                      <>
+                        <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+                          <TypeIcon />
+                        </div>
+
+                        <Tooltip label="Edit task">
+                          <button
+                            onClick={() => {
+                              setEditingTaskId(task._id);
+                              setEditValue(task.status === "completed" ? task.doneTask || task.todo : task.todo);
+                            }}
+                          >
+                            <LuNotebookPen color="blue" />
+                          </button>
+                        </Tooltip>
+
+                        <Tooltip label="Delete task">
+                          <button onClick={() => removeTask(task._id)}>
+                            <LuTrash2 color="red" />
+                          </button>
+                        </Tooltip>
+                      </>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
+
             <div className="flex justify-center mt-4">
               <button
-                className="bg-red-800 hover:bg-red-900 text-gray-300 px-6 py-2 rounded"
+                className="bg-red-800 hover:bg-red-900 text-gray-100 px-6 py-2 rounded"
                 onClick={() => {
                   setTaskManagerOpen(false);
                   setSelectedLog(null);
