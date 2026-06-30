@@ -1,3 +1,4 @@
+import { useState } from "react";
 import type { ReactNode } from "react";
 
 interface TooltipProps {
@@ -6,17 +7,18 @@ interface TooltipProps {
   position?: "top" | "bottom" | "left" | "right";
 }
 
-export default function Tooltip({
-  label,
-  children,
-}: TooltipProps) {
+export default function Tooltip({ label, children }: TooltipProps) {
+  const [isHovered, setIsHovered] = useState(false);
+
   return (
-    <div className="relative group">
+    <div className="relative inline-block" onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)}>
       {children}
 
-      <span className="absolute top-full left-1/2 -translate-x-1/2 mt-1 px-2 py-1 text-xs bg-gray-500 text-white rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-10">
-        {label}
-      </span>
+      {isHovered && (
+        <span className="absolute top-full left-1/2 -translate-x-1/2 mt-2 px-2 py-1 text-xs bg-gray-700 text-white rounded whitespace-nowrap pointer-events-none z-50 shadow-md">
+          {label}
+        </span>
+      )}
     </div>
   );
 }

@@ -184,48 +184,44 @@ export default function TodayLog({ logs }: Props) {
           <div className="flex flex-col gap-3">
             {tasks.map((task) => {
               const TypeIcon = taskTypeIcon[task.taskType];
+              const isEditing = editingTaskId === task._id;
 
               return (
-                <div
-                  key={task._id}
-                  className="group flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-gray-200 pb-3"
-                >
-                  <div className="flex items-start gap-2 min-w-0">
-                    <input
-                      type="checkbox"
-                      className="mt-1 shrink-0"
-                      checked={task.status === "completed"}
-                      onChange={() =>
-                        editTask(task._id, {
-                          status: task.status === "completed" ? "open" : "completed",
-                          ...(task.status !== "completed" && !task.doneTask ? { doneTask: task.todo } : {}),
-                        })
-                      }
-                    />
+                <div key={task._id} className="group border-b border-gray-200 pb-3">
+                  {isEditing ? (
+                    <div className="flex flex-col gap-2 w-full">
+                      <div className="flex items-start gap-2">
+                        <input
+                          type="checkbox"
+                          className="mt-2 shrink-0"
+                          checked={task.status === "completed"}
+                          onChange={() =>
+                            editTask(task._id, {
+                              status: task.status === "completed" ? "open" : "completed",
+                              ...(task.status !== "completed" && !task.doneTask ? { doneTask: task.todo } : {}),
+                            })
+                          }
+                        />
+                        <textarea
+                          autoFocus
+                          className="w-full min-h-[60px] border border-gray-300 rounded p-2"
+                          value={editValue}
+                          onChange={(e) => setEditValue(e.target.value)}
+                        />
+                      </div>
 
-                    {editingTaskId === task._id ? (
-                      <textarea
-                        autoFocus
-                        className="w-full min-h-[40px] border border-gray-300 rounded p-2"
-                        value={editValue}
-                        onChange={(e) => setEditValue(e.target.value)}
-                      />
-                    ) : (
-                      <div className="flex-1 min-w-0 text-sm">{task.status === "completed" ? task.doneTask || task.todo : task.todo}</div>
-                    )}
-                  </div>
-
-                  <div className="flex items-center gap-2 shrink-0 self-end sm:self-auto">
-                    {editingTaskId === task._id ? (
-                      <>
-                        <div className="flex gap-1">
+                      <div className="flex items-start gap-3">
+                        <div className="flex gap-1 rounded p-1">
                           {(["task", "solution", "question", "link"] as const).map((type) => {
                             const Icon = taskTypeIcon[type];
                             return (
                               <button
+                                title={`Change to ${type.charAt(0).toUpperCase() + type.slice(1)}`}
                                 key={type}
                                 type="button"
-                                className={`p-1 rounded ${task.taskType === type ? "bg-sky-100" : ""}`}
+                                className={`p-2 rounded flex items-center justify-center ${
+                                  task.taskType === type ? "bg-sky-100" : "hover:bg-gray-100"
+                                }`}
                                 onClick={() => editTask(task._id, { taskType: type })}
                               >
                                 <Icon />
@@ -234,27 +230,49 @@ export default function TodayLog({ logs }: Props) {
                           })}
                         </div>
 
-                        <button
-                          onClick={async () => {
-                            const trimmed = editValue.trim();
-                            if (!trimmed) return;
+                        <div className="flex items-center gap-2 ml-auto">
+                          <button
+                          title="Save changes"
+                            onClick={async () => {
+                              const trimmed = editValue.trim();
+                              if (!trimmed) return;
 
-                            await editTask(task._id, {
-                              ...(task.status === "completed" ? { doneTask: trimmed } : { todo: trimmed }),
-                            });
+                              await editTask(task._id, {
+                                ...(task.status === "completed" ? { doneTask: trimmed } : { todo: trimmed }),
+                              });
 
-                            setEditingTaskId(null);
-                          }}
-                        >
-                          <LuCheck color="green" />
-                        </button>
+                              setEditingTaskId(null);
+                            }}
+                          >
+                            <LuCheck color="green" size={20} />
+                          </button>
 
-                        <button onClick={() => setEditingTaskId(null)}>
-                          <LuX color="red" />
-                        </button>
-                      </>
-                    ) : (
-                      <>
+                          <button onClick={() => setEditingTaskId(null)} title="Cancel editing">
+                            <LuX color="red" size={20} />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                      <div className="flex items-start gap-2 min-w-0">
+                        <input
+                          type="checkbox"
+                          className="mt-1 shrink-0"
+                          checked={task.status === "completed"}
+                          onChange={() =>
+                            editTask(task._id, {
+                              status: task.status === "completed" ? "open" : "completed",
+                              ...(task.status !== "completed" && !task.doneTask ? { doneTask: task.todo } : {}),
+                            })
+                          }
+                        />
+                        <div className="flex-1 min-w-0 text-sm">
+                          {task.status === "completed" ? task.doneTask || task.todo : task.todo}
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-2 shrink-0 self-end sm:self-auto">
                         <div className="opacity-0 group-hover:opacity-100 transition-opacity">
                           <TypeIcon />
                         </div>
@@ -275,9 +293,9 @@ export default function TodayLog({ logs }: Props) {
                             <LuTrash2 color="red" />
                           </button>
                         </Tooltip>
-                      </>
-                    )}
-                  </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               );
             })}
