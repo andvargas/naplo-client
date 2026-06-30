@@ -55,7 +55,7 @@ export default function ActivitySelector({
 
   return (
     <div className="max-w-xl mx-auto px-4 space-y-2">
-      <div className="text-sm font-medium text-gray-700">Add new activity:</div>
+      <div className="text-sm font-medium text-gray-700">Select activity, and press Start:</div>
 
       <div className="flex items-center gap-2">
         <div className="grid grid-cols-3 gap-2 flex-1 min-w-0">
