@@ -141,7 +141,7 @@ export default function TodayLog({ logs }: Props) {
           }}
         >
           {/* Add task bar */}
-          <div className="flex flex-col sm:flex-row gap-2 mb-5">
+          <div className="flex gap-2 mb-5">
             <input
               className="flex-1 min-w-0 border border-gray-300 rounded p-2"
               value={newTaskText}
@@ -150,7 +150,7 @@ export default function TodayLog({ logs }: Props) {
             />
 
             <select
-              className="border border-gray-300 rounded p-2"
+              className="hidden md:block border border-gray-300 rounded p-2"
               value={newTaskType}
               onChange={(e) => setNewTaskType(e.target.value as "task" | "solution" | "question" | "link")}
             >
@@ -232,7 +232,7 @@ export default function TodayLog({ logs }: Props) {
 
                         <div className="flex items-center gap-2 ml-auto">
                           <button
-                          title="Save changes"
+                            title="Save changes"
                             onClick={async () => {
                               const trimmed = editValue.trim();
                               if (!trimmed) return;
@@ -267,9 +267,7 @@ export default function TodayLog({ logs }: Props) {
                             })
                           }
                         />
-                        <div className="flex-1 min-w-0 text-sm">
-                          {task.status === "completed" ? task.doneTask || task.todo : task.todo}
-                        </div>
+                        <div className="flex-1 text-left min-w-0 text-sm">{task.status === "completed" ? task.doneTask || task.todo : task.todo}</div>
                       </div>
 
                       <div className="flex items-center gap-2 shrink-0 self-end sm:self-auto">

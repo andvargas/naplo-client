@@ -48,7 +48,6 @@ export default function ActivitySelector({
 
         onAddActivityType(cleanType);
       }
-      // Reset the selector value back to empty so it doesn't stay stuck on "Add new type..."
       onActivityTypeChange("");
     } else {
       onActivityTypeChange(value);
