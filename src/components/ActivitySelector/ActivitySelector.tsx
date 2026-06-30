@@ -37,7 +37,6 @@ export default function ActivitySelector({
     if (value === "ADD_NEW_TYPE") {
       const newType = prompt("Enter new activity type:");
 
-      // Basic validation to ensure they didn't hit cancel or type empty spaces
       if (newType && newType.trim() !== "") {
         const cleanType = newType.trim();
 
@@ -55,43 +54,56 @@ export default function ActivitySelector({
   };
 
   return (
-    <div className="flex items-center justify-center gap-3 flex-wrap">
-      Add new activity:
-      <select className="px-3 py-2 bg-gray-200 rounded border" value={activityType} onChange={(e) => handleActivityTypeChange(e.target.value)}>
-        <option value="">Type</option>
+    <div className="max-w-xl mx-auto px-4 space-y-2">
+      <div className="text-sm font-medium text-gray-700">Add new activity:</div>
 
-        {activityTypes.map((type) => (
-          <option key={type} value={type}>
-            {type}
-          </option>
-        ))}
-        <option value="ADD_NEW_TYPE" className="text-green-600 font-semibold">
-          + Add new type...
-        </option>
-      </select>
-      <select className="px-3 py-2 bg-gray-200 rounded border" value={project} onChange={(e) => onProjectChange(e.target.value)}>
-        <option value="">Project</option>
+      <div className="flex items-center gap-2">
+        <div className="grid grid-cols-3 gap-2 flex-1 min-w-0">
+          <select
+            className="min-w-0 px-2 py-2 bg-gray-200 rounded border text-sm"
+            value={activityType}
+            onChange={(e) => handleActivityTypeChange(e.target.value)}
+          >
+            <option value="">Type</option>
+            {activityTypes.map((type) => (
+              <option key={type} value={type}>
+                {type}
+              </option>
+            ))}
+            <option value="ADD_NEW_TYPE" className="text-green-600 font-semibold">
+              + Add new...
+            </option>
+          </select>
 
-        {projects.map((p) => (
-          <option key={p} value={p}>
-            {p}
-          </option>
-        ))}
-      </select>
-      <select className="px-3 py-2 bg-gray-200 rounded border" value={customer} onChange={(e) => onCustomerChange(e.target.value)}>
-        <option value="">Customer</option>
+          <select className="min-w-0 px-2 py-2 bg-gray-200 rounded border text-sm" value={project} onChange={(e) => onProjectChange(e.target.value)}>
+            <option value="">Project</option>
+            {projects.map((p) => (
+              <option key={p} value={p}>
+                {p}
+              </option>
+            ))}
+          </select>
 
-        {customers.map((c) => (
-          <option key={c} value={c}>
-            {c}
-          </option>
-        ))}
-      </select>
-      <Tooltip label="Add new project">
-        <button onClick={onAddProject}>
-          <FaPlusCircle size={28} className="text-green-600 hover:scale-110 transition" />
-        </button>
-      </Tooltip>
+          <select
+            className="min-w-0 px-2 py-2 bg-gray-200 rounded border text-sm"
+            value={customer}
+            onChange={(e) => onCustomerChange(e.target.value)}
+          >
+            <option value="">Customer</option>
+            {customers.map((c) => (
+              <option key={c} value={c}>
+                {c}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <Tooltip label="Add new project">
+          <button onClick={onAddProject} className="shrink-0">
+            <FaPlusCircle size={24} className="text-green-600 hover:scale-110 transition" />
+          </button>
+        </Tooltip>
+      </div>
     </div>
   );
 }
