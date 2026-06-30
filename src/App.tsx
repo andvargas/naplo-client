@@ -15,6 +15,7 @@ import Journal from "./pages/Journal";
 import Projects from './pages/Projects'
 import Timesheet from './pages/Timesheet'
 import Week from './pages/Week'
+import ChangePassword from "./pages/ChangePassword";
 
 // Protected route wrapper
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -121,6 +122,16 @@ function App() {
             <ProtectedRoute>
               <Layout>
                 <Week />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/change-password"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <ChangePassword />
               </Layout>
             </ProtectedRoute>
           }
