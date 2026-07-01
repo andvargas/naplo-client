@@ -88,8 +88,11 @@ export default function Home() {
     const loadActiveLog = async () => {
       try {
         const response = await getTimelogs();
+        const today = new Date().toDateString();
 
-        const activeLogs = response.data.filter((log) => log.username === user.username && log.duration === 0);
+        const activeLogs = response.data.filter(
+          (log) => log.username === user.username && log.duration === 0 && new Date(log.startDate).toDateString() === today, // only today's open sessions
+        );
 
         if (activeLogs.length === 0) return;
 
@@ -309,6 +312,11 @@ Sessions completed: ${todaysLogs.length}
 
   const isPaused = stage === "Paused" && !activeLog;
 
+  const handleUpdateLog = async (id: string, data: Partial<Timelog>) => {
+    await updateTimelog(id, data);
+    await loadTodaySummary();
+  };
+
   
 
   return (
@@ -358,7 +366,7 @@ Sessions completed: ${todaysLogs.length}
           </div>
         </div>
       )}
-      <TodayLog logs={todayLogs} />
+      <TodayLog logs={todayLogs} projects={projects} activityTypes={user?.activityTypes ?? []} onUpdateLog={handleUpdateLog} />
 
       {isPaused && pauseStartedAt && (
         <div className="mt-4 text-center">

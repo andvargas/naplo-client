@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useTasks } from "@/hooks/useTasks";
 import type { Timelog } from "@/types";
+import type { Project } from "@/api/projects";
 import Modal from "@/components/Modal/Modal";
 import Tooltip from "@/components/Tooltip/Tooltip";
 import {
@@ -19,6 +20,9 @@ import QuickTaskInput from "@/components/Timelogs/QuickTaskInput";
 
 interface Props {
   logs: Timelog[];
+  projects: Project[];
+  activityTypes: string[];
+  onUpdateLog: (id: string, data: Partial<Timelog>) => Promise<void>;
 }
 
 const taskTypeIcon = {
@@ -28,15 +32,62 @@ const taskTypeIcon = {
   link: LuLink,
 };
 
-export default function TodayLog({ logs }: Props) {
+// Top-level component — not inside TodayLog
+function InlineSelect({
+  value,
+  options,
+  onSave,
+  onCancel,
+}: {
+  value: string;
+  options: { label: string; value: string }[];
+  onSave: (value: string) => Promise<void>;
+  onCancel: () => void;
+}) {
+  const [saving, setSaving] = useState(false);
+
+  const handleChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
+    if (e.target.value === value) {
+      onCancel();
+      return;
+    }
+    setSaving(true);
+    try {
+      await onSave(e.target.value);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <select
+      autoFocus
+      disabled={saving}
+      defaultValue={value}
+      onChange={handleChange}
+      onBlur={onCancel}
+      className="text-sm border border-blue-400 rounded px-1 py-0.5 bg-white focus:outline-none focus:ring-2 focus:ring-blue-400"
+    >
+      {options.map((o) => (
+        <option key={o.value} value={o.value}>
+          {o.label}
+        </option>
+      ))}
+    </select>
+  );
+}
+
+export default function TodayLog({ logs, projects, activityTypes, onUpdateLog }: Props) {
   const [selectedLog, setSelectedLog] = useState<Timelog | null>(null);
   const [quickTaskOpen, setQuickTaskOpen] = useState(false);
   const [taskManagerOpen, setTaskManagerOpen] = useState(false);
 
+  // Inline editing state — null means not editing, "project"|"activityType" means which field
+  const [editingField, setEditingField] = useState<{ logId: string; field: "project" | "activityType" } | null>(null);
+
   const sortedLogs = [...logs].sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime());
 
   const [newTaskText, setNewTaskText] = useState("");
-  const [newTaskType, setNewTaskType] = useState<"task" | "solution" | "question" | "link">("task");
   const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
   const [editValue, setEditValue] = useState("");
 
@@ -50,60 +101,123 @@ export default function TodayLog({ logs }: Props) {
     }
   }, [taskManagerOpen, selectedLog?._id]);
 
+  const handleProjectSave = async (logId: string, newProjectName: string) => {
+    // Auto-derive customer from the selected project
+    const matchedProject = projects.find((p) => p.projectName === newProjectName);
+    await onUpdateLog(logId, {
+      project: newProjectName,
+      customer: matchedProject?.customer ?? "",
+    });
+    setEditingField(null);
+  };
+
+  const handleActivityTypeSave = async (logId: string, newType: string) => {
+    await onUpdateLog(logId, { activityType: newType });
+    setEditingField(null);
+  };
+
+  const projectOptions = projects.filter((p) => p.projectName).map((p) => ({ label: p.projectName!, value: p.projectName! }));
+
+  const activityTypeOptions = activityTypes.map((t) => ({ label: t, value: t }));
+
+  const newTaskType = "task" as const;
+
   return (
     <>
       <h3 className="max-w-3xl mx-auto px-4 text-left mt-8 mb-2 text-lg font-semibold">Today's Activity</h3>
 
       <ul className="max-w-3xl mx-auto px-4 list-none space-y-4 text-left">
-        {sortedLogs.map((log) => (
-          <li
-            key={log._id}
-            className={`flex flex-col sm:flex-row sm:items-center gap-3 bg-gray-100 border border-gray-300 shadow-sm px-4 py-3 ${
-              log.duration === 0 ? "border-l-4 border-l-cyan-500" : ""
-            }`}
-          >
-            <span className="flex-1 text-sm sm:text-base">
-              At <strong>{formatTime(log.startDate)}</strong> started working on <strong>{log.project}</strong> ({log.activityType})
-              {log.duration === 0 ? (
-                <>
-                  {" "}
-                  · <span className="font-bold">Active</span>
-                </>
-              ) : (
-                <>
-                  {" "}
-                  · Spent <span className="font-bold">{Math.round(log.duration / 60000)}</span> minutes
-                </>
-              )}
-            </span>
+        {sortedLogs.map((log) => {
+          const isEditingProject = editingField?.logId === log._id && editingField?.field === "project";
+          const isEditingActivity = editingField?.logId === log._id && editingField?.field === "activityType";
 
-            <div className="flex items-center gap-2 justify-end shrink-0">
-              <Tooltip label="Add quick task">
-                <button
-                  className="border border-gray-300 bg-white rounded-full p-2 hover:bg-gray-50"
-                  onClick={() => {
-                    setSelectedLog(log);
-                    setQuickTaskOpen(true);
-                  }}
-                >
-                  <LuClipboardPlus color="green" />
-                </button>
-              </Tooltip>
+          return (
+            <li
+              key={log._id}
+              className={`flex flex-col sm:flex-row sm:items-center gap-3 bg-gray-100 border border-gray-300 shadow-sm px-4 py-3 ${
+                log.duration === 0 ? "border-l-4 border-l-cyan-500" : ""
+              }`}
+            >
+              <span className="flex-1 text-sm sm:text-base">
+                At <strong>{formatTime(log.startDate)}</strong> started working on {/* Inline editable project */}
+                {isEditingProject ? (
+                  <InlineSelect
+                    value={log.project}
+                    options={projectOptions}
+                    onSave={(val) => handleProjectSave(log._id, val)}
+                    onCancel={() => setEditingField(null)}
+                  />
+                ) : (
+                  <Tooltip label="Click to edit project">
+                    <strong
+                      className="cursor-pointer underline decoration-dotted hover:text-blue-600 transition-colors"
+                      onClick={() => setEditingField({ logId: log._id, field: "project" })}
+                    >
+                      {log.project}
+                    </strong>
+                  </Tooltip>
+                )}
+                {" ("}
+                {/* Inline editable activity type */}
+                {isEditingActivity ? (
+                  <InlineSelect
+                    value={log.activityType}
+                    options={activityTypeOptions}
+                    onSave={(val) => handleActivityTypeSave(log._id, val)}
+                    onCancel={() => setEditingField(null)}
+                  />
+                ) : (
+                  <Tooltip label="Click to edit activity type">
+                    <span
+                      className="cursor-pointer underline decoration-dotted hover:text-blue-600 transition-colors"
+                      onClick={() => setEditingField({ logId: log._id, field: "activityType" })}
+                    >
+                      {log.activityType}
+                    </span>
+                  </Tooltip>
+                )}
+                {")"}
+                {log.duration === 0 ? (
+                  <>
+                    {" "}
+                    · <span className="font-bold">Active</span>
+                  </>
+                ) : (
+                  <>
+                    {" "}
+                    · Spent <span className="font-bold">{Math.round(log.duration / 60000)}</span> minutes
+                  </>
+                )}
+              </span>
 
-              <Tooltip label="Manage tasks">
-                <button
-                  className="border border-gray-300 bg-white rounded-full p-2 hover:bg-gray-50"
-                  onClick={() => {
-                    setSelectedLog(log);
-                    setTaskManagerOpen(true);
-                  }}
-                >
-                  <LuClipboardPenLine color="blue" />
-                </button>
-              </Tooltip>
-            </div>
-          </li>
-        ))}
+              <div className="flex items-center gap-2 justify-end shrink-0">
+                <Tooltip label="Add quick task">
+                  <button
+                    className="border border-gray-300 bg-white rounded-full p-2 hover:bg-gray-50"
+                    onClick={() => {
+                      setSelectedLog(log);
+                      setQuickTaskOpen(true);
+                    }}
+                  >
+                    <LuClipboardPlus color="green" />
+                  </button>
+                </Tooltip>
+
+                <Tooltip label="Manage tasks">
+                  <button
+                    className="border border-gray-300 bg-white rounded-full p-2 hover:bg-gray-50"
+                    onClick={() => {
+                      setSelectedLog(log);
+                      setTaskManagerOpen(true);
+                    }}
+                  >
+                    <LuClipboardPenLine color="blue" />
+                  </button>
+                </Tooltip>
+              </div>
+            </li>
+          );
+        })}
       </ul>
 
       <Modal isOpen={quickTaskOpen} title="Quick Task" onClose={() => setQuickTaskOpen(false)}>
@@ -140,7 +254,6 @@ export default function TodayLog({ logs }: Props) {
             }
           }}
         >
-          {/* Add task bar */}
           <div className="flex gap-2 mb-5">
             <input
               className="flex-1 min-w-0 border border-gray-300 rounded p-2"
@@ -148,18 +261,6 @@ export default function TodayLog({ logs }: Props) {
               onChange={(e) => setNewTaskText(e.target.value)}
               placeholder="New task..."
             />
-
-            <select
-              className="hidden md:block border border-gray-300 rounded p-2"
-              value={newTaskType}
-              onChange={(e) => setNewTaskType(e.target.value as "task" | "solution" | "question" | "link")}
-            >
-              <option value="task">Task</option>
-              <option value="solution">Solution</option>
-              <option value="question">Question</option>
-              <option value="link">Link</option>
-            </select>
-
             <button
               className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded shrink-0"
               onClick={async () => {
@@ -173,14 +274,12 @@ export default function TodayLog({ logs }: Props) {
                 });
 
                 setNewTaskText("");
-                setNewTaskType("task");
               }}
             >
               Add
             </button>
           </div>
 
-          {/* Task list */}
           <div className="flex flex-col gap-3">
             {tasks.map((task) => {
               const TypeIcon = taskTypeIcon[task.taskType];
@@ -211,12 +310,11 @@ export default function TodayLog({ logs }: Props) {
                       </div>
 
                       <div className="flex items-start gap-3">
-                        <div className="flex gap-1 rounded p-1">
+                        <div className="grid grid-cols-2 gap-1 border border-gray-200 rounded p-1">
                           {(["task", "solution", "question", "link"] as const).map((type) => {
                             const Icon = taskTypeIcon[type];
                             return (
                               <button
-                                title={`Change to ${type.charAt(0).toUpperCase() + type.slice(1)}`}
                                 key={type}
                                 type="button"
                                 className={`p-2 rounded flex items-center justify-center ${
@@ -232,7 +330,6 @@ export default function TodayLog({ logs }: Props) {
 
                         <div className="flex items-center gap-2 ml-auto">
                           <button
-                            title="Save changes"
                             onClick={async () => {
                               const trimmed = editValue.trim();
                               if (!trimmed) return;
@@ -247,7 +344,7 @@ export default function TodayLog({ logs }: Props) {
                             <LuCheck color="green" size={20} />
                           </button>
 
-                          <button onClick={() => setEditingTaskId(null)} title="Cancel editing">
+                          <button onClick={() => setEditingTaskId(null)}>
                             <LuX color="red" size={20} />
                           </button>
                         </div>
@@ -267,7 +364,7 @@ export default function TodayLog({ logs }: Props) {
                             })
                           }
                         />
-                        <div className="flex-1 text-left min-w-0 text-sm">{task.status === "completed" ? task.doneTask || task.todo : task.todo}</div>
+                        <div className="flex-1 min-w-0 text-sm">{task.status === "completed" ? task.doneTask || task.todo : task.todo}</div>
                       </div>
 
                       <div className="flex items-center gap-2 shrink-0 self-end sm:self-auto">
