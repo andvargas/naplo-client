@@ -14,6 +14,7 @@ export default function useProjects(activeOnly = true) {
     try {
       const data = await getProjects();
       const filtered = data.filter((p) => p.username === user.username);
+      filtered.sort((a, b) => a.projectName.localeCompare(b.projectName));
 
       setProjects(activeOnly ? filtered.filter((p) => p.statusActive) : filtered);
     } finally {
