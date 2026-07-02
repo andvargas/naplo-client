@@ -310,7 +310,7 @@ export default function TodayLog({ logs, projects, activityTypes, onUpdateLog }:
                       </div>
 
                       <div className="flex items-start gap-3">
-                        <div className="grid grid-cols-2 gap-1 border border-gray-200 rounded p-1">
+                        <div className="flex gap-1 border border-gray-200 rounded p-1">
                           {(["task", "solution", "question", "link"] as const).map((type) => {
                             const Icon = taskTypeIcon[type];
                             return (
@@ -351,7 +351,7 @@ export default function TodayLog({ logs, projects, activityTypes, onUpdateLog }:
                       </div>
                     </div>
                   ) : (
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                    <div className="flex sm:flex-row sm:items-center sm:justify-between gap-2">
                       <div className="flex items-start gap-2 min-w-0">
                         <input
                           type="checkbox"
@@ -364,10 +364,10 @@ export default function TodayLog({ logs, projects, activityTypes, onUpdateLog }:
                             })
                           }
                         />
-                        <div className="flex-1 min-w-0 text-sm">{task.status === "completed" ? task.doneTask || task.todo : task.todo}</div>
+                        <div className="flex-1 min-w-0 text-left text-sm">{task.status === "completed" ? task.doneTask || task.todo : task.todo}</div>
                       </div>
 
-                      <div className="flex items-center gap-2 shrink-0 self-end sm:self-auto">
+                      <div className="flex items-center gap-2 shrink-0 self-end ml-auto sm:self-auto">
                         <div className="opacity-0 group-hover:opacity-100 transition-opacity">
                           <TypeIcon />
                         </div>
