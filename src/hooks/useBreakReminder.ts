@@ -17,7 +17,7 @@ export function useBreakReminder(
       const elapsed =
         (Date.now() - new Date(startDate).getTime()) / 60000;
 
-      if (elapsed >= 1 && !reminderShown.current) {
+      if (elapsed >= 50 && !reminderShown.current) {
         reminderShown.current = true;
 
         showBreakNotification(pauseTimer);

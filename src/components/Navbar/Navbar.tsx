@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import { FiLogOut, FiMenu, FiX } from "react-icons/fi";
+import { FiLogOut, FiMenu, FiX, FiSettings } from "react-icons/fi";
 import { useAuth } from "../../context/AuthContext";
 import Tooltip from "../Tooltip/Tooltip";
 
@@ -11,6 +11,10 @@ const navLinkClass = ({ isActive }: { isActive: boolean }) =>
 // Same styling but full-width, for the mobile dropdown
 const mobileNavLinkClass = ({ isActive }: { isActive: boolean }) =>
   `block px-4 py-3 rounded text-sm font-bold transition-colors no-underline
+  ${isActive ? "bg-teal-300 text-indigo-900" : "text-amber-100 hover:bg-teal-400 hover:text-white"}`;
+
+  const iconNavClass = ({ isActive }: { isActive: boolean }) =>
+    `p-2 rounded flex items-center justify-center transition-colors
   ${isActive ? "bg-teal-300 text-indigo-900" : "text-amber-100 hover:bg-teal-400 hover:text-white"}`;
 
 const Navbar = () => {
@@ -30,7 +34,7 @@ const Navbar = () => {
     <nav className="relative w-full bg-gray-900">
       <div className="flex flex-row justify-between items-center px-14 py-3 max-w-screen-xl mx-auto">
         <NavLink to="/" className="shrink-0" onClick={closeMenu}>
-          <span className="text-amber-100 font-bold text-lg tracking-wide">NAPLO</span>
+          <span className="text-amber-100 font-bold text-lg tracking-wide">NAPLO (beta)</span>
         </NavLink>
 
         {/* Desktop links */}
@@ -60,6 +64,13 @@ const Navbar = () => {
             </Tooltip>
           </li>
           <li className="ml-2 border-l border-gray-700 pl-2">
+            <Tooltip label="Settings">
+              <NavLink to="/settings" className={iconNavClass}>
+                <FiSettings />
+              </NavLink>
+            </Tooltip>
+          </li>
+          <li>
             <Tooltip label={`Logout ${state.user?.username ?? ""}`}>
               <button onClick={handleLogout} className="px-3 py-2 rounded text-amber-100 hover:bg-red-600 hover:text-white transition-colors">
                 <FiLogOut />
@@ -95,6 +106,11 @@ const Navbar = () => {
           <li>
             <NavLink to="/dashboard" className={mobileNavLinkClass} onClick={closeMenu}>
               DASHBOARD
+            </NavLink>
+          </li>
+          <li>
+            <NavLink to="/settings" className={mobileNavLinkClass} onClick={closeMenu}>
+              Settings
             </NavLink>
           </li>
           <li className="border-t border-gray-700 pt-1 mt-1">

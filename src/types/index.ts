@@ -1,9 +1,13 @@
 // User
 export interface User {
-  id: string
-  username: string
-  email: string
-  activityTypes: string[]
+  id: string;
+  username: string;
+  email: string;
+  activityTypes: string[];
+  settings: {
+    breakReminderMinutes: number;
+    notificationsEnabled: boolean;
+  };
 }
 
 export interface AuthResponse {

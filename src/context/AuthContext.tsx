@@ -15,7 +15,8 @@ type AuthAction =
   | { type: "LOGIN"; payload: { user: User; token: string } }
   | { type: "LOGOUT" }
   | { type: "SET_LOADING"; payload: boolean }
-  | { type: "UPDATE_USER_ACTIVITIES"; payload: string[] };
+  | { type: "UPDATE_USER_ACTIVITIES"; payload: string[] }
+  | { type: "UPDATE_USER_SETTINGS"; payload: User["settings"] };
 
 // Context shape
 interface AuthContextType {
@@ -24,6 +25,7 @@ interface AuthContextType {
   logout: () => void;
   updateActivityTypes: (newTypes: string[]) => void;
   user: User | null;
+  updateSettings: (settings: User["settings"]) => void;
 }
 
 const initialState: AuthState = {
@@ -60,6 +62,14 @@ const authReducer = (state: AuthState, action: AuthAction): AuthState => {
       return {
         ...state,
         user: updatedUser,
+      };
+    case "UPDATE_USER_SETTINGS":
+      if (!state.user) return state;
+      const updatedSettingsUser = { ...state.user, settings: action.payload };
+      localStorage.setItem("user", JSON.stringify(updatedSettingsUser));
+      return {
+        ...state,
+        user: updatedSettingsUser,
       };
     default:
       return state;
@@ -106,7 +116,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     dispatch({ type: "UPDATE_USER_ACTIVITIES", payload: newTypes });
   };
 
-  return <AuthContext.Provider value={{ state, login, logout, updateActivityTypes, user: state.user }}>{children}</AuthContext.Provider>;
+  const updateSettings = (settings: User["settings"]) => {
+    dispatch({
+      type: "UPDATE_USER_SETTINGS",
+      payload: settings,
+    });
+  };
+
+  return (
+    <AuthContext.Provider value={{ state, login, logout, updateActivityTypes, updateSettings, user: state.user }}>{children}</AuthContext.Provider>
+  );
 }
 
 // Custom hook for consuming auth context
