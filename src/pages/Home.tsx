@@ -11,6 +11,8 @@ import TodaySummary from "@/components/Timelogs/TodaySummary";
 import TodayLog from "@/components/Timelogs/TodayLog";
 import { addDiaryEntry } from "@/api/diaryentries";
 import { updateUserActivityTypes } from "@/api/user";
+import { useBreakReminder } from "@/hooks/useBreakReminder";
+import { requestNotificationPermission } from "@/services/notificationService";
 
 export default function Home() {
   const { user, updateActivityTypes } = useAuth();
@@ -169,6 +171,8 @@ export default function Home() {
   const handleStart = async () => {
     if (!user) return;
 
+    await requestNotificationPermission();
+
     if (!activityType || !project) {
       alert("Please select activity type and project");
       return;
@@ -218,6 +222,8 @@ export default function Home() {
       console.error("Failed to pause log", err);
     }
   };
+
+  useBreakReminder(activeLog?.startDate ?? null, handlePause);
 
   const startClass = stage === "Started" ? "bg-cyan-300 border border-black text-black" : "bg-green-600 text-white";
 
