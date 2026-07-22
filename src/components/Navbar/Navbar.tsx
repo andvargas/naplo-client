@@ -45,6 +45,11 @@ const Navbar = () => {
             </NavLink>
           </li>
           <li>
+            <NavLink to="/tasks" className={navLinkClass}>
+              TASKS
+            </NavLink>
+          </li>
+          <li>
             <NavLink to="/journal" className={navLinkClass}>
               JOURNAL
             </NavLink>

@@ -33,3 +33,8 @@ export const deleteTask = async (id: string): Promise<void> => {
 };
 
 export const getAllTasks = () => api.get<Task[]>("/tasks");
+
+export const getTasksByProject = async (project: string): Promise<Task[]> => {
+  const response = await api.get(`/tasks/project/${project}`);
+  return response.data;
+};

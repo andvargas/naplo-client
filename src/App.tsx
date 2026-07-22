@@ -17,6 +17,7 @@ import Timesheet from './pages/Timesheet'
 import Week from './pages/Week'
 import ChangePassword from "./pages/ChangePassword";
 import Settings from "./pages/Settings";
+import Tasks from "./pages/Tasks";
 
 // Protected route wrapper
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -143,6 +144,16 @@ function App() {
             <ProtectedRoute>
               <Layout>
                 <Settings />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/tasks"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <Tasks />
               </Layout>
             </ProtectedRoute>
           }
