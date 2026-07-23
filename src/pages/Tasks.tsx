@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { useTasks } from "@/hooks/useTasks";
-import { FiCheckCircle, FiCircle, FiClock, FiHelpCircle, FiLink } from "react-icons/fi";
+import { FiCheckCircle, FiCircle, FiClock, FiHelpCircle, FiLink, FiPlayCircle } from "react-icons/fi";
 import { LuTrash2, LuClipboardList, LuLightbulb } from "react-icons/lu";
 import Tooltip from "@/components/Tooltip/Tooltip";
+import { useAuth } from "@/context/AuthContext";
 
 export default function Tasks() {
   const [projectFilter, setProjectFilter] = useState("all");
@@ -30,6 +31,8 @@ export default function Tasks() {
       return true;
     });
   }, [tasks, projectFilter, typeFilter, statusFilter]);
+
+  const { activeLog } = useAuth();
 
   return (
     <div className="max-w-3xl mx-auto">
@@ -138,33 +141,69 @@ export default function Tasks() {
       </div>
 
       <div className="space-y-3">
-        {filteredTasks.map((task) => (
-          <div key={task._id} className="bg-gray-100 border border-gray-300 rounded p-4 flex gap-4">
-            <input
-              type="checkbox"
-              checked={task.status === "completed"}
-              onChange={() =>
-                editTask(task._id, {
-                  status: task.status === "completed" ? "open" : "completed",
-                })
-              }
-            />
+        {filteredTasks.map((task) => {
+          const isCompleted = task.status === "completed";
+          const isAttached = task.linkedTimelogId === activeLog?._id;
 
-            <div className="flex-1 text-left">
-              <div className={task.status === "completed" ? "line-through text-gray-500" : ""}>{task.todo}</div>
+          const assignedToCurrent = activeLog && task.linkedTimelogId === activeLog._id;
+          const canAssign = !!activeLog && !isCompleted && !isAttached;
 
-              <div className="text-sm text-gray-500 text-left">
-                {task.project} · {task.taskType}
+          return (
+            <div key={task._id} className="bg-gray-100 border border-gray-300 rounded p-4 flex gap-4">
+              <input
+                type="checkbox"
+                checked={isCompleted}
+                onChange={() =>
+                  editTask(task._id, {
+                    status: isCompleted ? "open" : "completed",
+                  })
+                }
+              />
+
+              <div className="flex-1 text-left">
+                <div className={isCompleted ? "line-through text-gray-500" : ""}>{task.todo}</div>
+
+                <div className="text-sm text-gray-500">
+                  {task.project} · {task.taskType}
+                </div>
+              </div>
+
+              <div className="flex gap-5 sm:gap-2 ms-auto">
+                <Tooltip
+                  label={
+                    !activeLog
+                      ? "Start a session first"
+                      : task.status === "completed"
+                        ? "Completed tasks can't be assigned"
+                        : assignedToCurrent
+                          ? "Already assigned"
+                          : "Assign to current session"
+                  }
+                >
+                  <button
+                    disabled={!canAssign}
+                    onClick={() =>
+                      editTask(task._id, {
+                        linkedTimelogId: activeLog!._id,
+                        status: "in progress",
+                      })
+                    }
+                    className={
+                      assignedToCurrent ? "text-green-600" : canAssign ? "text-blue-600 hover:text-blue-800" : "text-gray-400 cursor-not-allowed"
+                    }
+                  >
+                    <FiPlayCircle />
+                  </button>
+                </Tooltip>
+                <Tooltip label="Delete task">
+                  <button onClick={() => removeTask(task._id)} className="text-red-600">
+                    <LuTrash2 />
+                  </button>
+                </Tooltip>
               </div>
             </div>
-
-            <div className="flex gap-2 ms-auto">
-              <button onClick={() => removeTask(task._id)} className="text-red-600">
-                <LuTrash2 />
-              </button>
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

@@ -1,13 +1,14 @@
 import { createContext, useContext, useReducer, useEffect } from 'react'
 import type { ReactNode } from 'react'
-import type { User } from '../types'
+import type { User, Timelog } from "../types";
 
 // State shape
 interface AuthState {
-  user: User | null
-  token: string | null
-  isAuthenticated: boolean
-  isLoading: boolean
+  user: User | null;
+  token: string | null;
+  isAuthenticated: boolean;
+  isLoading: boolean;
+  activeLog: Timelog | null;
 }
 
 // Actions
@@ -16,7 +17,8 @@ type AuthAction =
   | { type: "LOGOUT" }
   | { type: "SET_LOADING"; payload: boolean }
   | { type: "UPDATE_USER_ACTIVITIES"; payload: string[] }
-  | { type: "UPDATE_USER_SETTINGS"; payload: User["settings"] };
+  | { type: "UPDATE_USER_SETTINGS"; payload: User["settings"] }
+  | { type: "SET_ACTIVE_LOG"; payload: Timelog | null };
 
 // Context shape
 interface AuthContextType {
@@ -26,14 +28,17 @@ interface AuthContextType {
   updateActivityTypes: (newTypes: string[]) => void;
   user: User | null;
   updateSettings: (settings: User["settings"]) => void;
+  activeLog: Timelog | null;
+  setActiveLog: (log: Timelog | null) => void;
 }
 
 const initialState: AuthState = {
   user: null,
   token: null,
+  activeLog: null,
   isAuthenticated: false,
   isLoading: true,
-}
+};
 
 const authReducer = (state: AuthState, action: AuthAction): AuthState => {
   switch (action.type) {
@@ -50,6 +55,7 @@ const authReducer = (state: AuthState, action: AuthAction): AuthState => {
         ...state,
         user: null,
         token: null,
+        activeLog: null,
         isAuthenticated: false,
         isLoading: false,
       };
@@ -70,6 +76,11 @@ const authReducer = (state: AuthState, action: AuthAction): AuthState => {
       return {
         ...state,
         user: updatedSettingsUser,
+      };
+    case "SET_ACTIVE_LOG":
+      return {
+        ...state,
+        activeLog: action.payload,
       };
     default:
       return state;
@@ -123,8 +134,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     });
   };
 
+  const setActiveLog = (log: Timelog | null) => {
+    dispatch({
+      type: "SET_ACTIVE_LOG",
+      payload: log,
+    });
+  };
+
   return (
-    <AuthContext.Provider value={{ state, login, logout, updateActivityTypes, updateSettings, user: state.user }}>{children}</AuthContext.Provider>
+    <AuthContext.Provider
+      value={{ state, login, logout, updateActivityTypes, updateSettings, activeLog: state.activeLog, setActiveLog, user: state.user }}
+    >
+      {children}
+    </AuthContext.Provider>
   );
 }
 

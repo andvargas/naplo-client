@@ -15,7 +15,7 @@ import { useBreakReminder } from "@/hooks/useBreakReminder";
 import { requestNotificationPermission } from "@/services/notificationService";
 
 export default function Home() {
-  const { user, updateActivityTypes } = useAuth();
+  const { user, activeLog, setActiveLog, updateActivityTypes } = useAuth();
   const [activityType, setActivityType] = useState("");
   const [project, setProject] = useState("");
   const [customer, setCustomer] = useState("");
@@ -27,7 +27,7 @@ export default function Home() {
 
   const customers = [...new Set(projects.map((p) => p.customer))];
 
-  const [activeLog, setActiveLog] = useState<Timelog | null>(null);
+  // const [activeLog, setActiveLog] = useState<Timelog | null>(null); delete this
   const [stage, setStage] = useState<"Idle" | "Started" | "Paused" | "Finished">("Idle");
   const [elapsedMinutes, setElapsedMinutes] = useState(0);
 
@@ -68,7 +68,6 @@ export default function Home() {
     setGrossMs(grossMs);
     setLunchBreakMs(lunchBreakMs);
   };
-
 
   useEffect(() => {
     if (!user) return;
@@ -322,8 +321,6 @@ Sessions completed: ${todaysLogs.length}
     await updateTimelog(id, data);
     await loadTodaySummary();
   };
-
-  
 
   return (
     <div>
