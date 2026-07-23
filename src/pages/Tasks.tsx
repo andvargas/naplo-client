@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { useTasks } from "@/hooks/useTasks";
-import { FiCheckCircle, FiCircle, FiClock, FiHelpCircle, FiLink, FiList, FiTool } from "react-icons/fi";
-import { LuTrash2 } from "react-icons/lu";
+import { FiCheckCircle, FiCircle, FiClock, FiHelpCircle, FiLink } from "react-icons/fi";
+import { LuTrash2, LuClipboardList, LuLightbulb } from "react-icons/lu";
+import Tooltip from "@/components/Tooltip/Tooltip";
 
 export default function Tasks() {
   const [projectFilter, setProjectFilter] = useState("all");
@@ -38,31 +39,49 @@ export default function Tasks() {
         {/* Type */}
 
         <div className="flex gap-2">
-          <button onClick={() => setTypeFilter("all")} className={`p-2 rounded ${typeFilter === "all" ? "bg-teal-300 text-indigo-900" : "bg-gray-200"}`}>
-            All
-          </button>
+          <Tooltip label="Filter by all types">
+            <button
+              onClick={() => setTypeFilter("all")}
+              className={`w-9 h-9 rounded ${typeFilter === "all" ? "bg-teal-300 border border-black text-indigo-900" : "bg-gray-200"}`}
+            >
+              All
+            </button>
+          </Tooltip>
 
-          <button onClick={() => setTypeFilter("task")} className={`p-2 rounded ${typeFilter === "task" ? "bg-teal-300 text-indigo-900" : "bg-gray-200"}`}>
-            <FiList />
-          </button>
+          <Tooltip label="Task">
+            <button
+              onClick={() => setTypeFilter("task")}
+              className={`w-9 h-9 flex items-center justify-center rounded ${typeFilter === "task" ? "bg-teal-300 border border-black text-indigo-900" : "bg-gray-200"}`}
+            >
+              <LuClipboardList />
+            </button>
+          </Tooltip>
+          <Tooltip label="Solution">
+            <button
+              onClick={() => setTypeFilter("solution")}
+              className={`w-9 h-9 flex items-center justify-center rounded ${typeFilter === "solution" ? "bg-teal-300 border border-black text-indigo-900" : "bg-gray-200"}`}
+            >
+              <LuLightbulb />
+            </button>
+          </Tooltip>
 
-          <button
-            onClick={() => setTypeFilter("solution")}
-            className={`p-2 rounded ${typeFilter === "solution" ? "bg-teal-300 text-indigo-900" : "bg-gray-200"}`}
-          >
-            <FiTool />
-          </button>
+          <Tooltip label="Question">
+            <button
+              onClick={() => setTypeFilter("question")}
+              className={`w-9 h-9 flex items-center justify-center rounded ${typeFilter === "question" ? "bg-teal-300 border border-black text-indigo-900" : "bg-gray-200"}`}
+            >
+              <FiHelpCircle />
+            </button>
+          </Tooltip>
 
-          <button
-            onClick={() => setTypeFilter("question")}
-            className={`p-2 rounded ${typeFilter === "question" ? "bg-teal-300 text-indigo-900" : "bg-gray-200"}`}
-          >
-            <FiHelpCircle />
-          </button>
-
-          <button onClick={() => setTypeFilter("link")} className={`p-2 rounded ${typeFilter === "link" ? "bg-teal-300 text-indigo-900" : "bg-gray-200"}`}>
-            <FiLink />
-          </button>
+          <Tooltip label="Link">
+            <button
+              onClick={() => setTypeFilter("link")}
+              className={`w-9 h-9 flex items-center justify-center rounded ${typeFilter === "link" ? "bg-teal-300 border border-black text-indigo-900" : "bg-gray-200"}`}
+            >
+              <FiLink />
+            </button>
+          </Tooltip>
         </div>
 
         {/* Project */}
@@ -80,33 +99,41 @@ export default function Tasks() {
         {/* Status */}
 
         <div className="flex gap-2">
-          <button
-            onClick={() => setStatusFilter("all")}
-            className={`p-2 rounded ${statusFilter === "all" ? "bg-teal-300 text-indigo-900" : "bg-gray-200"}`}
-          >
-            All
-          </button>
+          <Tooltip label="Filter by status">
+            <button
+              onClick={() => setStatusFilter("all")}
+              className={`w-9 h-9 flex items-center justify-center rounded ${statusFilter === "all" ? "bg-teal-300 border border-black text-indigo-900" : "bg-gray-200"}`}
+            >
+              All
+            </button>
+          </Tooltip>
 
-          <button
-            onClick={() => setStatusFilter("open")}
-            className={`p-2 rounded ${statusFilter === "open" ? "bg-teal-300 text-indigo-900" : "bg-gray-200"}`}
-          >
-            <FiCircle />
-          </button>
+          <Tooltip label="Open tasks">
+            <button
+              onClick={() => setStatusFilter("open")}
+              className={`w-9 h-9 flex items-center justify-center rounded ${statusFilter === "open" ? "bg-teal-300 border border-black text-indigo-900" : "bg-gray-200"}`}
+            >
+              <FiCircle />
+            </button>
+          </Tooltip>
 
-          <button
-            onClick={() => setStatusFilter("in progress")}
-            className={`p-2 rounded ${statusFilter === "in progress" ? "bg-teal-300 text-indigo-900" : "bg-gray-200"}`}
-          >
-            <FiClock />
-          </button>
+          <Tooltip label="In progress">
+            <button
+              onClick={() => setStatusFilter("in progress")}
+              className={`w-9 h-9 flex items-center justify-center rounded ${statusFilter === "in progress" ? "bg-teal-300 border border-black text-indigo-900" : "bg-gray-200"}`}
+            >
+              <FiClock />
+            </button>
+          </Tooltip>
 
-          <button
-            onClick={() => setStatusFilter("completed")}
-            className={`p-2 rounded ${statusFilter === "completed" ? "bg-teal-300 text-indigo-900" : "bg-gray-200"}`}
-          >
-            <FiCheckCircle />
-          </button>
+          <Tooltip label="Completed">
+            <button
+              onClick={() => setStatusFilter("completed")}
+              className={`w-9 h-9 flex items-center justify-center rounded ${statusFilter === "completed" ? "bg-teal-300 border border-black text-indigo-900" : "bg-gray-200"}`}
+            >
+              <FiCheckCircle />
+            </button>
+          </Tooltip>
         </div>
       </div>
 

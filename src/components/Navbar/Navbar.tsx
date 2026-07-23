@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { FiLogOut, FiMenu, FiX, FiSettings } from "react-icons/fi";
+import { LuSettings } from "react-icons/lu";
 import { useAuth } from "../../context/AuthContext";
 import Tooltip from "../Tooltip/Tooltip";
 
@@ -99,6 +100,11 @@ const Navbar = () => {
             </NavLink>
           </li>
           <li>
+            <NavLink to="/tasks" className={mobileNavLinkClass} onClick={closeMenu}>
+              Tasks
+            </NavLink>
+          </li>
+          <li>
             <NavLink to="/journal" className={mobileNavLinkClass} onClick={closeMenu}>
               JOURNAL
             </NavLink>
@@ -113,18 +119,24 @@ const Navbar = () => {
               DASHBOARD
             </NavLink>
           </li>
-          <li>
-            <NavLink to="/settings" className={mobileNavLinkClass} onClick={closeMenu}>
-              Settings
-            </NavLink>
-          </li>
-          <li className="border-t border-gray-700 pt-1 mt-1">
+
+          <li className="border-t border-gray-700 flex items-center px-4 py-2">
+            {/* 1. Logout button takes up remaining width (flex-1) */}
             <button
               onClick={handleLogout}
-              className="w-full text-left flex items-center gap-2 px-4 py-3 rounded text-amber-100 hover:bg-red-600 hover:text-white transition-colors"
+              className="flex-1 flex items-center gap-2 py-1 rounded text-amber-100 hover:bg-red-600 hover:text-white transition-colors text-left"
             >
               <FiLogOut /> Logout {state.user?.username ?? ""}
             </button>
+
+            {/* 2. Settings button aligned perfectly in the same row */}
+            <NavLink
+              to="/settings"
+              className="w-9 h-9 flex items-center justify-center text-xl text-amber-100 hover:text-white transition-colors"
+              onClick={closeMenu}
+            >
+              <LuSettings />
+            </NavLink>
           </li>
         </ul>
       )}
