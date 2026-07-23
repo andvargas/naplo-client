@@ -10,6 +10,22 @@ export interface CreateTaskData {
   important?: boolean;
 }
 
+export interface GetTasksParams {
+  page?: number;
+  limit?: number;
+  project?: string;
+  status?: string;
+  taskType?: string;
+}
+
+export interface PaginatedTasks {
+  tasks: Task[];
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+}
+
 export const getTasksByTimelog = async (timelogId: string): Promise<Task[]> => {
   const response = await api.get(`/tasks/timelog/${timelogId}`);
 
@@ -32,7 +48,13 @@ export const deleteTask = async (id: string): Promise<void> => {
   await api.delete(`/tasks/${id}`);
 };
 
-export const getAllTasks = () => api.get<Task[]>("/tasks");
+export const getAllTasks = async (params: GetTasksParams): Promise<PaginatedTasks> => {
+  const response = await api.get("/tasks", {
+    params,
+  });
+
+  return response.data;
+};
 
 export const getTasksByProject = async (project: string): Promise<Task[]> => {
   const response = await api.get(`/tasks/project/${project}`);

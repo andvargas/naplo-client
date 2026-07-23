@@ -6,14 +6,22 @@ import type { Task } from "../types";
 export const useTasks = (timelogId?: string, global = false) => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(false);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
-  const loadTasks = async () => {
+  const loadTasks = async (pageToLoad = page) => {
     setLoading(true);
 
     try {
       if (global) {
-        const response = await getAllTasks();
-        setTasks(response.data);
+        const response = await getAllTasks({
+          page: pageToLoad,
+          limit: 50,
+        });
+
+        setTasks(response.tasks);
+        setPage(response.page);
+        setTotalPages(response.totalPages);
       } else if (timelogId) {
         const data = await getTasksByTimelog(timelogId);
         setTasks(data);
@@ -52,5 +60,8 @@ export const useTasks = (timelogId?: string, global = false) => {
     addTask,
     editTask,
     removeTask,
+    page,
+    totalPages,
+    setPage,
   };
 };

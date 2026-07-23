@@ -10,11 +10,11 @@ export default function Tasks() {
   const [typeFilter, setTypeFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
 
-  const { tasks, reload, editTask, removeTask } = useTasks(undefined, true);
+  const { tasks, reload, editTask, removeTask, page, totalPages } = useTasks(undefined, true);
 
   useEffect(() => {
-    reload();
-  }, []);
+    reload(page);
+  }, [page]);
 
   const projects = useMemo(() => {
     return [...new Set(tasks.map((t) => t.project))].sort();
@@ -204,6 +204,19 @@ export default function Tasks() {
             </div>
           );
         })}
+        <div className="flex justify-center items-center gap-4 mt-6">
+          <button disabled={page === 1} onClick={() => reload(page - 1)} className="px-4 py-2 border rounded disabled:opacity-50">
+            Previous
+          </button>
+
+          <span>
+            Page {page} of {totalPages}
+          </span>
+
+          <button disabled={page === totalPages} onClick={() => reload(page + 1)} className="px-4 py-2 border rounded disabled:opacity-50">
+            Next
+          </button>
+        </div>
       </div>
     </div>
   );
