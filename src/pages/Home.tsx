@@ -40,6 +40,8 @@ export default function Home() {
   const [lunchBreakMs, setLunchBreakMs] = useState(0);
   const [lunchBreakApplied, setLunchBreakApplied] = useState(false);
   const [grossMs, setGrossMs] = useState(0);
+  const [pausedLogId, setPausedLogId] = useState<string | null>(null);
+  const [isLunchBreak, setIsLunchBreak] = useState(false);
 
   const loadTodaySummary = async () => {
     if (!user) return;
@@ -58,7 +60,7 @@ export default function Home() {
 
     const lastSession = completedLogs.length > 0 ? completedLogs[completedLogs.length - 1].duration : 0;
 
-    const lunchBreakMs = todaysLogs.reduce((sum, log) => sum + (log.totalDailyMinutes || 0), 0);
+    const lunchBreakMs = todaysLogs.reduce((sum, log) => sum + (log.breakDuration || 0), 0);
     const grossMs = totalMs - lunchBreakMs;
 
     setTodayTotalMs(totalMs);
@@ -177,6 +179,18 @@ export default function Home() {
       return;
     }
 
+    if (isLunchBreak && pauseStartedAt && pausedLogId) {
+      const lunchDuration = Date.now() - pauseStartedAt.getTime();
+
+      await updateTimelog(pausedLogId, {
+        breakDuration: lunchDuration,
+      });
+
+      setPausedLogId(null);
+      setPauseStartedAt(null);
+      setIsLunchBreak(false);
+    }
+
     try {
       const response = await addTimelog({
         username: user.username,
@@ -186,7 +200,7 @@ export default function Home() {
         project,
         customer,
         activityType,
-        totalDailyMinutes: 0,
+        breakDuration: 0,
       });
 
       setActiveLog(response.data);
@@ -208,6 +222,7 @@ export default function Home() {
         duration,
       });
 
+      setPausedLogId(updated.data._id);
       setPauseStartedAt(new Date());
 
       setActiveLog(null);
@@ -287,32 +302,10 @@ Sessions completed: ${todaysLogs.length}
       console.error(err);
     }
   };
-  const handleLunchBreak = async () => {
-    if (!pauseStartedAt || !user) return;
 
-    try {
-      const response = await getTimelogs();
-      const today = new Date().toDateString();
-
-      const todaysLogs = response.data.filter((log) => log.username === user.username && new Date(log.startDate).toDateString() === today);
-
-      if (!todaysLogs.length) return;
-
-      const lastLog = todaysLogs[todaysLogs.length - 1];
-
-      const lunchBreakMs = pauseStartedAt.getTime() - Date.now();
-
-      await updateTimelog(lastLog._id, {
-        totalDailyMinutes: lunchBreakMs,
-      });
-
-      setLunchBreakApplied(true);
-      await loadTodaySummary();
-
-      alert("Lunch break recorded");
-    } catch (err) {
-      console.error(err);
-    }
+  const handleLunchBreak = () => {
+    setIsLunchBreak(true);
+    setLunchBreakApplied(true);
   };
 
   const isPaused = stage === "Paused" && !activeLog;

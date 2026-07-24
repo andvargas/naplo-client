@@ -26,7 +26,9 @@ export default function Timesheet() {
   const [hourlyRate, setHourlyRate] = useState(35);
 
   useEffect(() => {
-    getAllTasks().then((res) => setTasks(res.data));
+    getAllTasks({ page: 1, limit: 1000 })
+      .then((res) => setTasks(res.tasks))
+      .catch(console.error);
   }, []);
 
   const tasksByLog = useMemo(() => {

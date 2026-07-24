@@ -50,7 +50,7 @@ export default function Dashboard() {
   useEffect(() => {
     if (!user) return;
 
-    getAllTasks().then((res) => setTasks(res.data));
+    getAllTasks({ page: 1, limit: 1000 }).then((res) => setTasks(res.tasks));
   }, [user]);
 
   useEffect(() => {

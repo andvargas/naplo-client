@@ -17,17 +17,17 @@ export interface AuthResponse {
 
 // Timelog
 export interface Timelog {
-  _id: string
-  username: string
-  tasksAccomplished: [string, boolean][]
-  duration: number
-  startDate: string
-  project: string
-  customer: string
-  activityType: string
-  totalDailyMinutes: number
-  createdAt: string
-  updatedAt: string
+  _id: string;
+  username: string;
+  tasksAccomplished: [string, boolean][];
+  duration: number;
+  startDate: string;
+  project: string;
+  customer: string;
+  activityType: string;
+  breakDuration: number;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export type NewTimelog = Omit<Timelog, '_id' | 'createdAt' | 'updatedAt'>
