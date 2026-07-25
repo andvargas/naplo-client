@@ -9,7 +9,7 @@ import { addTimelog, updateTimelog, getTimelogs } from "@/api/timelogs";
 import type { Timelog } from "@/types";
 import TodaySummary from "@/components/Timelogs/TodaySummary";
 import TodayLog from "@/components/Timelogs/TodayLog";
-import { addDiaryEntry } from "@/api/diaryentries";
+import { addDiaryEntry, generateDiarySummary } from "@/api/diaryentries";
 import { updateUserActivityTypes } from "@/api/user";
 import { useBreakReminder } from "@/hooks/useBreakReminder";
 import { requestNotificationPermission } from "@/services/notificationService";
@@ -42,6 +42,7 @@ export default function Home() {
   const [grossMs, setGrossMs] = useState(0);
   const [pausedLogId, setPausedLogId] = useState<string | null>(null);
   const [isLunchBreak, setIsLunchBreak] = useState(false);
+  const [finishMessage, setFinishMessage] = useState<string | null>(null);
 
   const loadTodaySummary = async () => {
     if (!user) return;
@@ -278,20 +279,28 @@ export default function Home() {
       const projectsWorked = [...new Set(todaysLogs.map((log) => log.project))];
 
       const diaryEntry = `
-Finished for today, you spent ${formatMs(totalMs)} hours working.
-
+Finished for today, you spent a net total of ${formatMs(totalMs)} hours working.
 Projects worked on:
 ${projectsWorked.map((p) => `- ${p}`).join("\n")}
-
 Sessions completed: ${todaysLogs.length}
 `.trim();
 
-      await addDiaryEntry({
+      // Persist the work entry before making the optional AI request, so a failed
+      // summary never prevents the user's work record from being saved.
+      const savedEntry = await addDiaryEntry({
         username: user.username,
         diaryEntry,
         date: new Date().toISOString(),
         entryType: "work",
       });
+
+      try {
+        await generateDiarySummary(savedEntry.data._id);
+        setFinishMessage("Work entry saved and AI daily summary added. You can edit it in Journal.");
+      } catch (summaryError) {
+        console.error("Failed to generate AI daily summary", summaryError);
+        setFinishMessage("Work entry saved. The optional AI daily summary could not be generated.");
+      }
 
       setActiveLog(null);
       setElapsedMinutes(0);
@@ -347,6 +356,7 @@ Sessions completed: ${todaysLogs.length}
           </button>
         </div>
       </div>
+      {finishMessage && <p className="mt-3 text-center text-sm text-gray-600">{finishMessage}</p>}
       {activeLog && (
         <div className="mt-4 text-center">
           <div>

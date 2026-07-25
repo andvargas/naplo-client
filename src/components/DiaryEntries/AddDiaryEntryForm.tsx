@@ -6,6 +6,7 @@ interface DiaryFormData {
   diaryEntry: string;
   date: string;
   entryType: string;
+  aiSummary?: string;
 }
 
 interface Props {
@@ -20,12 +21,13 @@ export default function AddDiaryEntryForm({ onSubmit, initialValues, submitLabel
   const [diaryEntry, setDiaryEntry] = useState(initialValues?.diaryEntry ?? "");
   const [date, setDate] = useState(initialValues?.date ?? todayStr());
   const [entryType, setEntryType] = useState(initialValues?.entryType ?? ENTRY_TYPES[0]);
+  const [aiSummary, setAiSummary] = useState(initialValues?.aiSummary ?? "");
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!diaryEntry.trim()) return;
 
-    await onSubmit({ diaryEntry, date, entryType });
+    await onSubmit({ diaryEntry, date, entryType, aiSummary: aiSummary.trim() || undefined });
   };
 
   return (
@@ -56,6 +58,19 @@ export default function AddDiaryEntryForm({ onSubmit, initialValues, submitLabel
             </option>
           ))}
         </select>
+      </div>
+
+      <div>
+        <label className="mb-1 block text-sm font-medium text-gray-700" htmlFor="ai-summary">
+          AI daily summary <span className="font-normal text-gray-500">(optional)</span>
+        </label>
+        <textarea
+          id="ai-summary"
+          className="w-full border rounded p-2 min-h-[88px]"
+          placeholder="An optional AI-generated summary appears here after Finish."
+          value={aiSummary}
+          onChange={(e) => setAiSummary(e.target.value)}
+        />
       </div>
 
       <button type="submit" className="bg-green-600 text-white px-4 py-2 rounded">

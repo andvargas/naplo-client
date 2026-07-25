@@ -6,6 +6,8 @@ export interface DiaryEntry {
   diaryEntry: string;
   date: string;
   entryType: string;
+  aiSummary?: string;
+  aiSummaryGeneratedAt?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -15,11 +17,14 @@ export interface NewDiaryEntry {
   diaryEntry: string;
   date: string;
   entryType: string;
+  aiSummary?: string;
 }
 
 export const getDiaryEntries = () => api.get<DiaryEntry[]>("/entries");
 
 export const addDiaryEntry = (data: NewDiaryEntry) => api.post("/entries/add", data);
+
+export const generateDiarySummary = (id: string) => api.post<DiaryEntry>(`/entries/${id}/generate-summary`);
 
 export const updateDiaryEntry = (id: string, data: Partial<NewDiaryEntry>) => api.patch<DiaryEntry>(`/entries/${id}`, data);
 

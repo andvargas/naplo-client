@@ -32,7 +32,16 @@ function JournalEntry({ entry, onEdit, onDelete }: { entry: DiaryEntry; onEdit: 
 
       {/* Text */}
       <div className="px-4 pb-2 text-left">
-        <p className={`text-sm whitespace-pre-wrap text-gray-800 ${expanded ? "" : "line-clamp-3"}`}>{entry.diaryEntry}</p>
+        <p className={`text-sm whitespace-pre-wrap text-gray-800 ${expanded ? "" : "line-clamp-3"}`}>
+          {entry.diaryEntry}
+          {entry.aiSummary && (
+            <>
+              {"\n\n"}
+              <span className="font-semibold text-violet-700">AI daily summary: </span>
+              {entry.aiSummary}
+            </>
+          )}
+        </p>
       </div>
 
       {/* Expand/collapse toggle */}
@@ -56,7 +65,7 @@ const Journal: React.FC = () => {
 
   const filteredEntries = filterType ? entries.filter((e) => e.entryType === filterType) : entries;
 
-  const handleAdd = async (data: { diaryEntry: string; date: string; entryType: string }) => {
+  const handleAdd = async (data: { diaryEntry: string; date: string; entryType: string; aiSummary?: string }) => {
     try {
       await createEntry(data);
       setShowAddModal(false);
@@ -66,7 +75,7 @@ const Journal: React.FC = () => {
     }
   };
 
-  const handleUpdate = async (data: { diaryEntry: string; date: string; entryType: string }) => {
+  const handleUpdate = async (data: { diaryEntry: string; date: string; entryType: string; aiSummary?: string }) => {
     if (!editingEntry) return;
 
     try {
@@ -141,6 +150,7 @@ const Journal: React.FC = () => {
               diaryEntry: editingEntry.diaryEntry,
               date: editingEntry.date ? editingEntry.date.slice(0, 10) : "",
               entryType: editingEntry.entryType,
+              aiSummary: editingEntry.aiSummary,
             }}
             submitLabel="Save changes"
             onSubmit={handleUpdate}

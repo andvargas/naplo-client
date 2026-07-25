@@ -84,6 +84,8 @@ export interface DiaryEntry {
   diaryEntry: string
   date?: string
   entryType: string
+  aiSummary?: string
+  aiSummaryGeneratedAt?: string
   createdAt: string
   updatedAt: string
 }
