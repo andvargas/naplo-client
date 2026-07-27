@@ -101,7 +101,7 @@ const Navbar = () => {
           </li>
           <li>
             <NavLink to="/tasks" className={mobileNavLinkClass} onClick={closeMenu}>
-              Tasks
+              TASKS
             </NavLink>
           </li>
           <li>

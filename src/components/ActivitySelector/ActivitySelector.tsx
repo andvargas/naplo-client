@@ -53,6 +53,8 @@ export default function ActivitySelector({
     }
   };
 
+  const sortedProjects = [...projects].sort((a, b) => a.localeCompare(b, undefined, { sensitivity: "base" }));
+
   return (
     <div className="max-w-xl mx-auto px-4 space-y-2">
       <div className="text-sm font-medium text-gray-700">Select activity, and press Start:</div>
@@ -77,7 +79,7 @@ export default function ActivitySelector({
 
           <select className="min-w-0 px-2 py-2 bg-gray-200 rounded border text-sm" value={project} onChange={(e) => onProjectChange(e.target.value)}>
             <option value="">Project</option>
-            {projects.map((p) => (
+            {sortedProjects.map((p) => (
               <option key={p} value={p}>
                 {p}
               </option>
