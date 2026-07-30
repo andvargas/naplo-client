@@ -4,13 +4,23 @@ import { FiCheckCircle, FiCircle, FiClock, FiHelpCircle, FiLink, FiPlayCircle } 
 import { LuTrash2, LuClipboardList, LuLightbulb } from "react-icons/lu";
 import Tooltip from "@/components/Tooltip/Tooltip";
 import { useAuth } from "@/context/AuthContext";
+import Modal from "@/components/Modal/Modal";
+import useProjects from "@/hooks/useProjects";
+import type { Task } from "@/types";
 
 export default function Tasks() {
   const [projectFilter, setProjectFilter] = useState("all");
   const [typeFilter, setTypeFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [newTaskText, setNewTaskText] = useState("");
+  const [newTaskProject, setNewTaskProject] = useState("");
+  const [newTaskType, setNewTaskType] = useState<Task["taskType"]>("task");
+  const [addingTask, setAddingTask] = useState(false);
+  const [addError, setAddError] = useState<string | null>(null);
 
-  const { tasks, reload, editTask, removeTask, page, totalPages } = useTasks(undefined, true);
+  const { tasks, reload, addTask, editTask, removeTask, page, totalPages } = useTasks(undefined, true);
+  const { projects: availableProjects } = useProjects();
 
   useEffect(() => {
     reload(page);
@@ -34,9 +44,44 @@ export default function Tasks() {
 
   const { activeLog } = useAuth();
 
+  const openAddModal = () => {
+    setNewTaskText("");
+    setNewTaskProject(availableProjects[0]?.projectName ?? "");
+    setNewTaskType("task");
+    setAddError(null);
+    setShowAddModal(true);
+  };
+
+  const handleAddTask = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!newTaskText.trim() || !newTaskProject) return;
+
+    setAddingTask(true);
+    setAddError(null);
+    try {
+      await addTask({
+        todo: newTaskText.trim(),
+        project: newTaskProject,
+        taskType: newTaskType,
+        status: "in progress",
+      });
+      setShowAddModal(false);
+    } catch (error) {
+      console.error("Failed to add task", error);
+      setAddError("Failed to add task.");
+    } finally {
+      setAddingTask(false);
+    }
+  };
+
   return (
     <div className="max-w-3xl mx-auto">
-      <h1 className="text-2xl font-bold mb-6">Tasks</h1>
+      <div className="flex items-center justify-between gap-4 mb-6">
+        <h1 className="text-2xl font-bold">Tasks</h1>
+        <button onClick={openAddModal} className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded text-sm">
+          Add Task
+        </button>
+      </div>
 
       <div className="flex flex-wrap justify-between items-center gap-6 mb-6">
         {/* Type */}
@@ -218,6 +263,47 @@ export default function Tasks() {
           </button>
         </div>
       </div>
+
+      <Modal isOpen={showAddModal} title="Add Task" onClose={() => setShowAddModal(false)}>
+        <form onSubmit={handleAddTask} className="space-y-4">
+          <textarea
+            autoFocus
+            className="w-full min-h-28 border rounded p-2"
+            value={newTaskText}
+            onChange={(event) => setNewTaskText(event.target.value)}
+            placeholder="What are you working on?"
+          />
+          <select
+            className="w-full border rounded p-2"
+            value={newTaskProject}
+            onChange={(event) => setNewTaskProject(event.target.value)}
+          >
+            <option value="" disabled>
+              Select a project
+            </option>
+            {availableProjects.map((project) => (
+              <option key={project._id} value={project.projectName}>
+                {project.projectName}
+              </option>
+            ))}
+          </select>
+          <select className="w-full border rounded p-2" value={newTaskType} onChange={(event) => setNewTaskType(event.target.value as Task["taskType"])}>
+            <option value="task">Task</option>
+            <option value="solution">Solution</option>
+            <option value="question">Question</option>
+            <option value="link">Link</option>
+          </select>
+          <p className="text-sm text-gray-500">New tasks are created as in progress and are not linked to a timelog.</p>
+          {addError && <p className="text-sm text-red-600">{addError}</p>}
+          <button
+            type="submit"
+            disabled={addingTask || !newTaskText.trim() || !newTaskProject}
+            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded disabled:opacity-50"
+          >
+            {addingTask ? "Adding..." : "Add Task"}
+          </button>
+        </form>
+      </Modal>
     </div>
   );
 }

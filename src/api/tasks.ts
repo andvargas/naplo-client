@@ -6,6 +6,7 @@ export interface CreateTaskData {
   project: string;
   linkedTimelogId?: string;
   taskType?: Task["taskType"];
+  status?: Task["status"];
   due?: string;
   important?: boolean;
 }
