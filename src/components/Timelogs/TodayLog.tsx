@@ -13,6 +13,7 @@ import {
   LuLightbulb,
   LuCircleHelp,
   LuLink,
+  LuExternalLink,
   LuCheck,
   LuX,
 } from "react-icons/lu";
@@ -30,6 +31,17 @@ const taskTypeIcon = {
   solution: LuLightbulb,
   question: LuCircleHelp,
   link: LuLink,
+};
+
+const getHttpUrl = (value: string) => {
+  const candidate = /^https?:\/\//i.test(value.trim()) ? value.trim() : `https://${value.trim()}`;
+
+  try {
+    const url = new URL(candidate);
+    return url.protocol === "http:" || url.protocol === "https:" ? url.href : null;
+  } catch {
+    return null;
+  }
 };
 
 // Top-level component — not inside TodayLog
@@ -284,6 +296,8 @@ export default function TodayLog({ logs, projects, activityTypes, onUpdateLog }:
             {tasks.map((task) => {
               const TypeIcon = taskTypeIcon[task.taskType];
               const isEditing = editingTaskId === task._id;
+              const linkUrl = task.taskType === "link" ? getHttpUrl(task.todo) : null;
+              const displayText = task.status === "completed" ? task.doneTask || task.todo : task.todo;
 
               return (
                 <div key={task._id} className="group border-b border-gray-200 pb-3">
@@ -364,10 +378,38 @@ export default function TodayLog({ logs, projects, activityTypes, onUpdateLog }:
                             })
                           }
                         />
-                        <div className="flex-1 min-w-0 text-left text-sm">{task.status === "completed" ? task.doneTask || task.todo : task.todo}</div>
+                        <div className="flex-1 min-w-0 text-left text-sm break-words">
+                          {linkUrl && task.status !== "completed" ? (
+                            <a
+                              href={linkUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-blue-600 underline hover:text-blue-800"
+                            >
+                              {displayText}
+                            </a>
+                          ) : (
+                            displayText
+                          )}
+                        </div>
                       </div>
 
                       <div className="flex items-center gap-2 shrink-0 self-end ml-auto sm:self-auto">
+                        {linkUrl && task.status === "completed" && (
+                          <Tooltip label="Open original link">
+                            <a
+                              href={linkUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              aria-label="Open original link"
+                              className="inline-flex items-center gap-1 rounded border border-blue-200 bg-blue-50 px-2 py-1 text-sm text-blue-700 hover:bg-blue-100"
+                            >
+                              <LuExternalLink />
+                              <span>Open link</span>
+                            </a>
+                          </Tooltip>
+                        )}
+
                         <div className="opacity-0 group-hover:opacity-100 transition-opacity">
                           <TypeIcon />
                         </div>
