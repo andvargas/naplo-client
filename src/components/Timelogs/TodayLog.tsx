@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useTasks } from "@/hooks/useTasks";
 import type { Timelog } from "@/types";
 import type { Project } from "@/api/projects";
@@ -100,6 +100,9 @@ export default function TodayLog({ logs, projects, activityTypes, onUpdateLog }:
   const sortedLogs = [...logs].sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime());
 
   const [newTaskText, setNewTaskText] = useState("");
+  const [addingTask, setAddingTask] = useState(false);
+  const [addTaskError, setAddTaskError] = useState<string | null>(null);
+  const addingTaskRef = useRef(false);
   const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
   const [editValue, setEditValue] = useState("");
 
@@ -133,6 +136,41 @@ export default function TodayLog({ logs, projects, activityTypes, onUpdateLog }:
   const activityTypeOptions = activityTypes.map((t) => ({ label: t, value: t }));
 
   const newTaskType = "task" as const;
+
+  const handleAddSessionTask = async (closeAfterAdding: boolean) => {
+    if (!selectedLog || addingTaskRef.current) return;
+
+    const text = newTaskText.trim();
+    if (!text) {
+      if (closeAfterAdding) {
+        setTaskManagerOpen(false);
+        setSelectedLog(null);
+      }
+      return;
+    }
+
+    addingTaskRef.current = true;
+    setAddingTask(true);
+    setAddTaskError(null);
+    try {
+      await addTask({
+        todo: text,
+        project: selectedLog.project,
+        linkedTimelogId: selectedLog._id,
+        taskType: newTaskType,
+      });
+      setNewTaskText("");
+      if (closeAfterAdding) {
+        setTaskManagerOpen(false);
+        setSelectedLog(null);
+      }
+    } catch {
+      setAddTaskError("Could not add the task. Please try again.");
+    } finally {
+      addingTaskRef.current = false;
+      setAddingTask(false);
+    }
+  };
 
   return (
     <>
@@ -220,6 +258,7 @@ export default function TodayLog({ logs, projects, activityTypes, onUpdateLog }:
                     className="border border-gray-300 bg-white rounded-full p-2 hover:bg-gray-50"
                     onClick={() => {
                       setSelectedLog(log);
+                      setAddTaskError(null);
                       setTaskManagerOpen(true);
                     }}
                   >
@@ -257,40 +296,32 @@ export default function TodayLog({ logs, projects, activityTypes, onUpdateLog }:
           setSelectedLog(null);
         }}
       >
-        <div
-          onKeyDown={(e) => {
-            if (e.key === "Enter" && editingTaskId === null) {
-              e.preventDefault();
-              setTaskManagerOpen(false);
-              setSelectedLog(null);
-            }
-          }}
-        >
+        <div>
           <div className="flex gap-2 mb-5">
             <input
+              autoFocus
+              aria-label="New task"
+              readOnly={addingTask}
               className="flex-1 min-w-0 border border-gray-300 rounded p-2"
               value={newTaskText}
               onChange={(e) => setNewTaskText(e.target.value)}
               placeholder="New task..."
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.nativeEvent.isComposing) {
+                  e.preventDefault();
+                  if (!e.repeat) void handleAddSessionTask(true);
+                }
+              }}
             />
             <button
               className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded shrink-0"
-              onClick={async () => {
-                if (!selectedLog || !newTaskText.trim()) return;
-
-                await addTask({
-                  todo: newTaskText,
-                  project: selectedLog.project,
-                  linkedTimelogId: selectedLog._id,
-                  taskType: newTaskType,
-                });
-
-                setNewTaskText("");
-              }}
+              disabled={addingTask || !newTaskText.trim()}
+              onClick={() => void handleAddSessionTask(false)}
             >
-              Add
+              {addingTask ? "Adding..." : "Add"}
             </button>
           </div>
+          {addTaskError && <p role="alert" className="mb-4 text-sm text-red-600">{addTaskError}</p>}
 
           <div className="flex flex-col gap-3">
             {tasks.map((task) => {
