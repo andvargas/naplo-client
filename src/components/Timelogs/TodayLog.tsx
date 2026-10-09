@@ -16,6 +16,7 @@ import {
   LuExternalLink,
   LuCheck,
   LuX,
+  LuTrophy,
 } from "react-icons/lu";
 import QuickTaskInput from "@/components/Timelogs/QuickTaskInput";
 
@@ -28,7 +29,8 @@ interface Props {
 
 const taskTypeIcon = {
   task: LuClipboardList,
-  solution: LuLightbulb,
+  solution: LuTrophy,
+  idea: LuLightbulb,
   question: LuCircleHelp,
   link: LuLink,
 };
@@ -356,7 +358,7 @@ export default function TodayLog({ logs, projects, activityTypes, onUpdateLog }:
 
                       <div className="flex items-start gap-3">
                         <div className="flex gap-1 border border-gray-200 rounded p-1">
-                          {(["task", "solution", "question", "link"] as const).map((type) => {
+                          {(["task", "idea", "solution", "question", "link"] as const).map((type) => {
                             const Icon = taskTypeIcon[type];
                             return (
                               <button
@@ -411,12 +413,7 @@ export default function TodayLog({ logs, projects, activityTypes, onUpdateLog }:
                         />
                         <div className="flex-1 min-w-0 text-left text-sm break-words">
                           {linkUrl && task.status !== "completed" ? (
-                            <a
-                              href={linkUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-blue-600 underline hover:text-blue-800"
-                            >
+                            <a href={linkUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline hover:text-blue-800">
                               {displayText}
                             </a>
                           ) : (

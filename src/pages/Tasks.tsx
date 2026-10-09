@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useTasks } from "@/hooks/useTasks";
 import { FiCheckCircle, FiCircle, FiClock, FiHelpCircle, FiLink, FiPlayCircle } from "react-icons/fi";
-import { LuTrash2, LuClipboardList, LuLightbulb } from "react-icons/lu";
+import { LuTrash2, LuClipboardList, LuLightbulb, LuTrophy } from "react-icons/lu";
 import Tooltip from "@/components/Tooltip/Tooltip";
 import { useAuth } from "@/context/AuthContext";
 import Modal from "@/components/Modal/Modal";
@@ -104,12 +104,20 @@ export default function Tasks() {
               <LuClipboardList />
             </button>
           </Tooltip>
+          <Tooltip label="Idea">
+            <button
+              onClick={() => setTypeFilter("idea")}
+              className={`w-9 h-9 flex items-center justify-center rounded ${typeFilter === "idea" ? "bg-teal-300 border border-black text-indigo-900" : "bg-gray-200"}`}
+            >
+              <LuLightbulb />
+            </button>
+          </Tooltip>
           <Tooltip label="Solution">
             <button
               onClick={() => setTypeFilter("solution")}
               className={`w-9 h-9 flex items-center justify-center rounded ${typeFilter === "solution" ? "bg-teal-300 border border-black text-indigo-900" : "bg-gray-200"}`}
             >
-              <LuLightbulb />
+              <LuTrophy />
             </button>
           </Tooltip>
 
@@ -273,11 +281,7 @@ export default function Tasks() {
             onChange={(event) => setNewTaskText(event.target.value)}
             placeholder="What are you working on?"
           />
-          <select
-            className="w-full border rounded p-2"
-            value={newTaskProject}
-            onChange={(event) => setNewTaskProject(event.target.value)}
-          >
+          <select className="w-full border rounded p-2" value={newTaskProject} onChange={(event) => setNewTaskProject(event.target.value)}>
             <option value="" disabled>
               Select a project
             </option>
@@ -287,8 +291,13 @@ export default function Tasks() {
               </option>
             ))}
           </select>
-          <select className="w-full border rounded p-2" value={newTaskType} onChange={(event) => setNewTaskType(event.target.value as Task["taskType"])}>
+          <select
+            className="w-full border rounded p-2"
+            value={newTaskType}
+            onChange={(event) => setNewTaskType(event.target.value as Task["taskType"])}
+          >
             <option value="task">Task</option>
+            <option value="idea">Idea</option>
             <option value="solution">Solution</option>
             <option value="question">Question</option>
             <option value="link">Link</option>

@@ -52,7 +52,7 @@ export interface Task {
   doneTask?: string;
   status: "open" | "completed" | "in progress";
   due?: string;
-  taskType: "task" | "solution" | "question" | "link";
+  taskType: "task" | "solution" | "question" | "link" | "idea";
   important: boolean;
   project: string;
   linkedTimelogId?: string;
